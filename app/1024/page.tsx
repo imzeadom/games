@@ -16,6 +16,17 @@ type MergeState = {
   best: number;
   keepPlaying: boolean;
 };
+type TileMovement = {
+  from: number;
+  to: number;
+  value: number;
+};
+type MoveResult = {
+  board: number[];
+  gained: number;
+  moved: boolean;
+  movements: TileMovement[];
+};
 
 const STORAGE_KEY = "paper-arcade-1024";
 const SIZE = 4;
@@ -56,46 +67,46 @@ function lineIndices(direction: Direction, line: number): number[] {
   return backward.map((row) => row * SIZE + line);
 }
 
-function mergeLine(values: number[]): { values: number[]; gained: number } {
-  const compact = values.filter(Boolean);
-  const merged: number[] = [];
-  let gained = 0;
-
-  for (let index = 0; index < compact.length; index += 1) {
-    if (compact[index] === compact[index + 1]) {
-      const combined = compact[index] * 2;
-      merged.push(combined);
-      gained += combined;
-      index += 1;
-    } else {
-      merged.push(compact[index]);
-    }
-  }
-
-  while (merged.length < SIZE) merged.push(0);
-  return { values: merged, gained };
-}
-
-function moveBoard(
-  board: number[],
-  direction: Direction,
-): { board: number[]; gained: number; moved: boolean } {
+function moveBoard(board: number[], direction: Direction): MoveResult {
   const next = emptyBoard();
+  const movements: TileMovement[] = [];
   let gained = 0;
 
   for (let line = 0; line < SIZE; line += 1) {
     const indices = lineIndices(direction, line);
-    const result = mergeLine(indices.map((index) => board[index]));
-    gained += result.gained;
-    indices.forEach((index, valueIndex) => {
-      next[index] = result.values[valueIndex];
-    });
+    const tiles = indices
+      .map((index) => ({ index, value: board[index] }))
+      .filter((tile) => tile.value !== 0);
+    let destination = 0;
+
+    for (let source = 0; source < tiles.length; source += 1) {
+      const tile = tiles[source];
+      const matchingTile = tiles[source + 1];
+      const target = indices[destination];
+
+      movements.push({ from: tile.index, to: target, value: tile.value });
+
+      if (matchingTile?.value === tile.value) {
+        movements.push({
+          from: matchingTile.index,
+          to: target,
+          value: matchingTile.value,
+        });
+        next[target] = tile.value * 2;
+        gained += next[target];
+        source += 1;
+      } else {
+        next[target] = tile.value;
+      }
+      destination += 1;
+    }
   }
 
   return {
     board: next,
     gained,
     moved: next.some((value, index) => value !== board[index]),
+    movements,
   };
 }
 
@@ -127,7 +138,9 @@ export default function Merge1024() {
   const [game, setGame] = useState<MergeState | null>(null);
   const [showWin, setShowWin] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
+  const [animation, setAnimation] = useState<TileMovement[] | null>(null);
   const touchStart = useRef<[number, number] | null>(null);
+  const animationTimer = useRef<number | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -149,22 +162,35 @@ export default function Merge1024() {
     if (game) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(game));
   }, [game]);
 
-  const move = useCallback((direction: Direction) => {
-    setGame((current) => {
-      if (!current) return current;
-      const result = moveBoard(current.board, direction);
-      if (!result.moved) return current;
+  useEffect(
+    () => () => {
+      if (animationTimer.current) window.clearTimeout(animationTimer.current);
+    },
+    [],
+  );
 
-      const board = addTile(result.board);
-      const score = current.score + result.gained;
-      const best = Math.max(current.best, score);
+  const move = useCallback(
+    (direction: Direction) => {
+      if (!game || animation || animationTimer.current) return;
+      const result = moveBoard(game.board, direction);
+      if (!result.moved) return;
 
-      if (!current.keepPlaying && board.includes(1024)) setShowWin(true);
-      if (!hasMoves(board)) setShowGameOver(true);
+      setAnimation(result.movements);
+      animationTimer.current = window.setTimeout(() => {
+        const board = addTile(result.board);
+        const score = game.score + result.gained;
+        const best = Math.max(game.best, score);
 
-      return { ...current, board, score, best };
-    });
-  }, []);
+        if (!game.keepPlaying && board.includes(1024)) setShowWin(true);
+        if (!hasMoves(board)) setShowGameOver(true);
+
+        setGame({ ...game, board, score, best });
+        setAnimation(null);
+        animationTimer.current = null;
+      }, 170);
+    },
+    [animation, game],
+  );
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -184,6 +210,9 @@ export default function Merge1024() {
   }, [move]);
 
   const reset = () => {
+    if (animationTimer.current) window.clearTimeout(animationTimer.current);
+    animationTimer.current = null;
+    setAnimation(null);
     setGame((current) => newGame(current?.best ?? 0));
     setShowWin(false);
     setShowGameOver(false);
@@ -252,14 +281,44 @@ export default function Merge1024() {
             onPointerUp={(event) => completeSwipe(event.clientX, event.clientY)}
           >
             {game.board.map((value, index) => (
-              <div
-                className={value ? "merge-tile has-value" : "merge-tile"}
-                key={index}
-                style={value ? tileStyle(value) : undefined}
-              >
-                {value || ""}
+              <div className="merge-slot" key={index}>
+                {!animation && value !== 0 && (
+                  <div
+                    className="merge-tile has-value"
+                    style={tileStyle(value)}
+                  >
+                    {value}
+                  </div>
+                )}
               </div>
             ))}
+            {animation && (
+              <div className="merge-animation-layer" aria-hidden="true">
+                {animation.map((tile, index) => {
+                  const fromRow = Math.floor(tile.from / SIZE);
+                  const fromColumn = tile.from % SIZE;
+                  const toRow = Math.floor(tile.to / SIZE);
+                  const toColumn = tile.to % SIZE;
+                  const style = {
+                    ...tileStyle(tile.value),
+                    "--from-row": fromRow,
+                    "--from-column": fromColumn,
+                    "--move-row": toRow - fromRow,
+                    "--move-column": toColumn - fromColumn,
+                  } as CSSProperties;
+
+                  return (
+                    <div
+                      className="merge-tile has-value moving-tile"
+                      key={`${tile.from}-${tile.to}-${index}`}
+                      style={style}
+                    >
+                      {tile.value}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
           <p className="merge-hint">
             <span aria-hidden="true">↔</span>

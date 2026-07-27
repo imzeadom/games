@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 import { PwaRegister } from "./pwa-register";
+import { SITE_NAME, SITE_URL } from "./site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
@@ -15,12 +16,37 @@ export async function generateMetadata(): Promise<Metadata> {
     "数独、合成 1024 与原创飞行小游戏，支持离线游玩并可安装到手机主屏幕。";
 
   return {
+    metadataBase: new URL(SITE_URL),
     title,
     description,
-    applicationName: "纸上游戏厅",
+    applicationName: SITE_NAME,
+    alternates: { canonical: SITE_URL },
+    keywords: [
+      "在线小游戏",
+      "PWA 游戏",
+      "数独",
+      "1024 游戏",
+      "休闲游戏",
+      "离线游戏",
+    ],
+    authors: [{ name: SITE_NAME }],
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
+    category: "games",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
     manifest: "/manifest.webmanifest",
     icons: {
       icon: [
+        { url: "/favicon.ico", sizes: "any" },
         { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
         { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
       ],
@@ -36,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: siteUrl,
       title,
       description,
-      siteName: "纸上游戏厅",
+      siteName: SITE_NAME,
       locale: "zh_CN",
       images: [{ url: `${siteUrl}/og.png`, width: 1731, height: 909 }],
     },

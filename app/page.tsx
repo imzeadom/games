@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { SITE_NAME, SITE_URL } from "./site";
 
 const games = [
   {
@@ -49,15 +49,62 @@ const games = [
       <div className="mini-sky" aria-hidden="true">
         <span className="cloud cloud-one" />
         <span className="cloud cloud-two" />
-        <Image src="/sky-lark.png" alt="" width={110} height={110} />
+        {/* Static PNG avoids a runtime image optimizer request on Sites. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/sky-lark.png" alt="" width={110} height={110} />
       </div>
     ),
   },
 ];
 
 export default function GamesHome() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: SITE_NAME,
+        inLanguage: "zh-CN",
+      },
+      {
+        "@type": "ItemList",
+        name: "纸上游戏厅游戏列表",
+        numberOfItems: games.length,
+        itemListElement: games.map((game, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          url: `${SITE_URL}${game.href}`,
+          name: game.title,
+          description: game.description,
+        })),
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: SITE_NAME,
+        applicationCategory: "GameApplication",
+        operatingSystem: "Any",
+        url: SITE_URL,
+        description:
+          "数独、合成 1024 与原创飞行小游戏组成的中文 PWA 游戏合集。",
+        offers: {
+          "@type": "Offer",
+          price: 0,
+          priceCurrency: "USD",
+        },
+      },
+    ],
+  };
+
   return (
     <main className="hub-shell">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+        }}
+      />
       <header className="site-header hub-header">
         <Link className="brand" href="/" aria-label="纸上游戏厅首页">
           <span className="brand-mark" aria-hidden="true">
@@ -112,7 +159,9 @@ export default function GamesHome() {
 
       <footer className="hub-footer">
         <span>纸上游戏厅 · 第一辑</span>
-        <span>无广告 · 进度仅存于你的设备</span>
+        <span>
+          无广告 · 进度仅存于你的设备 · <Link href="/privacy">隐私说明</Link>
+        </span>
       </footer>
     </main>
   );

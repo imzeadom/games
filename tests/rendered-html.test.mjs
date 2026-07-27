@@ -34,6 +34,7 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
     ["/sudoku", "纸上数独｜纸上游戏厅", "manifest-sudoku.webmanifest"],
     ["/1024", "合成 1024｜纸上游戏厅", "manifest-1024.webmanifest"],
     ["/sky-hop", "云雀跃｜纸上游戏厅", "manifest-sky-hop.webmanifest"],
+    ["/privacy", "隐私说明｜纸上游戏厅", "manifest.webmanifest"],
   ];
 
   for (const [pathname, title, manifest] of routes) {
@@ -42,17 +43,18 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
     const html = await response.text();
     assert.match(html, /<html lang="zh-CN">/);
     assert.ok(html.includes(`<title>${title}</title>`));
-    assert.ok(html.includes(`rel="manifest" href="/${manifest}"`));
+    assert.match(html, new RegExp(`rel="manifest"[^>]+${manifest}`));
     assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
   }
 });
 
-test("ships three games, original art, and offline assets", async () => {
-  const [hub, sudoku, merge, skyHop, serviceWorker] = await Promise.all([
+test("ships animated games, original art, privacy, and discovery assets", async () => {
+  const [hub, sudoku, merge, skyHop, privacy, serviceWorker] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/sudoku/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/1024/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/sky-hop/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/privacy/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../public/sw.js", import.meta.url), "utf8"),
   ]);
 
@@ -61,11 +63,14 @@ test("ships three games, original art, and offline assets", async () => {
   assert.match(hub, /云雀跃/);
   assert.match(sudoku, /label: "困难"/);
   assert.match(sudoku, /setNoteMode/);
-  assert.match(merge, /mergeLine/);
+  assert.match(merge, /TileMovement/);
+  assert.match(merge, /moving-tile/);
   assert.match(merge, /completeSwipe/);
   assert.match(skyHop, /drawGate/);
   assert.match(skyHop, /sky-lark\.png/);
-  assert.match(serviceWorker, /paper-arcade-v2/);
+  assert.doesNotMatch(skyHop, /next\/image/);
+  assert.match(privacy, /不接入广告、行为分析、营销追踪/);
+  assert.match(serviceWorker, /paper-arcade-v3/);
 
   await Promise.all([
     access(new URL("../public/icon-1024-192.png", import.meta.url)),
@@ -73,6 +78,10 @@ test("ships three games, original art, and offline assets", async () => {
     access(new URL("../public/sky-hop-background.png", import.meta.url)),
     access(new URL("../public/sky-lark.png", import.meta.url)),
     access(new URL("../public/og.png", import.meta.url)),
+    access(new URL("../public/favicon.ico", import.meta.url)),
+    access(new URL("../public/llms.txt", import.meta.url)),
+    access(new URL("../app/sitemap.ts", import.meta.url)),
+    access(new URL("../app/robots.ts", import.meta.url)),
   ]);
   await assert.rejects(access(new URL("../app/_sites-preview", projectRoot)));
 });

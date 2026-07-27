@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -297,7 +296,9 @@ export default function SkyHop() {
           />
           {phase !== "playing" && (
             <button className="sky-overlay" onClick={flap}>
-              <Image src="/sky-lark.png" alt="" width={120} height={120} />
+              {/* Static PNG avoids a runtime image optimizer request on Sites. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/sky-lark.png" alt="" width={120} height={120} />
               <strong>{phase === "ready" ? "轻点起飞" : "再飞一次"}</strong>
               <span>
                 {phase === "ready"

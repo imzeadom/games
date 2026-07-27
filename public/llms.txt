@@ -1,0 +1,19 @@
+# 纸上游戏厅
+
+> 一个中文、轻量、可离线安装的浏览器小游戏合集。
+
+Canonical URL: https://paper-sudoku-games.imzeadom.chatgpt.site/
+
+## Games
+
+- [纸上数独](https://paper-sudoku-games.imzeadom.chatgpt.site/sudoku): 简单、中等、困难三档数独，支持草稿、删除草稿、相同数字与行列高亮。
+- [合成 1024](https://paper-sudoku-games.imzeadom.chatgpt.site/1024): 使用方向键或触屏滑动方块，合并相同数字并挑战 1024。
+- [云雀跃](https://paper-sudoku-games.imzeadom.chatgpt.site/sky-hop): 使用原创云雀角色与天空素材的点击飞行躲避游戏。
+
+## Site facts
+
+- 所有游戏均为 Progressive Web App，可添加到主屏幕并离线游玩。
+- 不含广告、分析追踪或营销 Cookie。
+- 游戏进度仅保存在用户当前浏览器的 localStorage 中。
+- 云雀角色、天空背景与站点社交分享图为本站原创生成素材。
+- [隐私说明](https://paper-sudoku-games.imzeadom.chatgpt.site/privacy)

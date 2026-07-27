@@ -781,6 +781,7 @@ footer {
   *::after {
     scroll-behavior: auto !important;
     transition: none !important;
+    animation-duration: 0.01ms !important;
   }
 }
 
@@ -1032,6 +1033,15 @@ footer {
   margin-top: 48px;
 }
 
+.hub-footer a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.hub-footer a:hover {
+  color: var(--accent);
+}
+
 /* Shared game navigation */
 
 .game-nav {
@@ -1053,6 +1063,90 @@ footer {
 
 .back-link:hover {
   color: var(--accent);
+}
+
+/* Privacy */
+
+.privacy-shell {
+  width: min(980px, calc(100% - 48px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 26px 0 60px;
+}
+
+.privacy-content {
+  padding-top: clamp(52px, 9vw, 110px);
+}
+
+.privacy-content h1 {
+  max-width: 760px;
+  margin: 12px 0 24px;
+  font-family: "STSong", "SimSun", serif;
+  font-size: clamp(38px, 7vw, 72px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.privacy-lead {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.privacy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 52px 0 40px;
+  border-top: 1px solid rgb(23 35 31 / 18%);
+  border-bottom: 1px solid rgb(23 35 31 / 18%);
+}
+
+.privacy-grid section {
+  padding: 28px 28px 32px 0;
+}
+
+.privacy-grid section + section {
+  border-left: 1px solid rgb(23 35 31 / 14%);
+  padding-left: 28px;
+}
+
+.privacy-grid span {
+  color: var(--accent);
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+}
+
+.privacy-grid h2 {
+  margin: 14px 0 12px;
+  font-family: "STSong", "SimSun", serif;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.privacy-grid p,
+.privacy-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.privacy-actions {
+  min-height: 68px;
+}
+
+.privacy-actions p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.privacy-note {
+  max-width: 720px;
+  margin-top: 30px;
 }
 
 /* 1024 */
@@ -1133,27 +1227,39 @@ footer {
 }
 
 .merge-board {
+  --merge-gap: clamp(7px, 1.2vw, 12px);
+  --merge-padding: clamp(10px, 1.6vw, 16px);
+
+  position: relative;
   display: grid;
   width: 100%;
   aspect-ratio: 1;
   touch-action: none;
   grid-template-columns: repeat(4, 1fr);
-  gap: clamp(7px, 1.2vw, 12px);
+  gap: var(--merge-gap);
   border: 1px solid rgb(23 35 31 / 22%);
   border-radius: 8px;
-  padding: clamp(10px, 1.6vw, 16px);
+  padding: var(--merge-padding);
   background: #a99c87;
   box-shadow: 0 25px 70px rgb(42 50 44 / 15%);
   user-select: none;
 }
 
-.merge-tile {
+.merge-slot {
   display: grid;
   min-width: 0;
   aspect-ratio: 1;
   place-items: center;
   border-radius: 5px;
   background: rgb(255 250 239 / 24%);
+}
+
+.merge-tile {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  border-radius: 5px;
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
   font-size: clamp(21px, 5vw, 45px);
   font-weight: 750;
@@ -1165,6 +1271,33 @@ footer {
   color: var(--tile-color);
   box-shadow: 0 4px 8px rgb(50 42 30 / 8%);
   animation: tile-appear 130ms ease-out;
+}
+
+.merge-animation-layer {
+  --merge-cell: calc((100% - 3 * var(--merge-gap)) / 4);
+
+  position: absolute;
+  inset: var(--merge-padding);
+  pointer-events: none;
+}
+
+.moving-tile {
+  position: absolute;
+  top: calc(var(--from-row) * (var(--merge-cell) + var(--merge-gap)));
+  left: calc(var(--from-column) * (var(--merge-cell) + var(--merge-gap)));
+  width: var(--merge-cell);
+  height: var(--merge-cell);
+  animation: tile-move 170ms cubic-bezier(0.22, 0.8, 0.35, 1) forwards;
+  will-change: transform;
+}
+
+@keyframes tile-move {
+  to {
+    transform: translate(
+      calc(var(--move-column) * (var(--merge-cell) + var(--merge-gap))),
+      calc(var(--move-row) * (var(--merge-cell) + var(--merge-gap)))
+    );
+  }
 }
 
 .merge-hint {
@@ -1450,6 +1583,27 @@ footer {
     margin-top: 28px;
   }
 
+  .privacy-shell {
+    width: 100%;
+    padding: 16px 14px 48px;
+  }
+
+  .privacy-grid {
+    display: block;
+    margin-top: 36px;
+  }
+
+  .privacy-grid section,
+  .privacy-grid section + section {
+    border: 0;
+    border-bottom: 1px solid rgb(23 35 31 / 12%);
+    padding: 24px 0;
+  }
+
+  .privacy-grid section:last-child {
+    border-bottom: 0;
+  }
+
   .merge-shell {
     width: 100%;
     padding: 16px 14px;
@@ -1484,8 +1638,8 @@ footer {
   }
 
   .merge-board {
-    gap: 6px;
-    padding: 8px;
+    --merge-gap: 6px;
+    --merge-padding: 8px;
   }
 
   .sky-shell {

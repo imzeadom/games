@@ -1,9 +1,10 @@
-const CACHE_NAME = "paper-arcade-v2";
+const CACHE_NAME = "paper-arcade-v3";
 const APP_SHELL = [
   "/",
   "/sudoku",
   "/1024",
   "/sky-hop",
+  "/privacy",
   "/manifest.webmanifest",
   "/manifest-sudoku.webmanifest",
   "/manifest-1024.webmanifest",
@@ -15,7 +16,11 @@ const APP_SHELL = [
   "/icon-sky-192.png",
   "/icon-sky-512.png",
   "/sky-hop-background.png",
-  "/sky-lark.png"
+  "/sky-lark.png",
+  "/favicon.ico",
+  "/llms.txt",
+  "/robots.txt",
+  "/sitemap.xml"
 ];
 
 self.addEventListener("install", (event) => {
