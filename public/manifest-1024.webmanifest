@@ -1,0 +1,26 @@
+{
+  "name": "合成 1024",
+  "short_name": "1024",
+  "description": "滑动并合并相同数字，挑战合成 1024。",
+  "start_url": "/1024",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4efe2",
+  "theme_color": "#243c35",
+  "lang": "zh-CN",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-1024-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-1024-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

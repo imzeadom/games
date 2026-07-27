@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
+import { PwaRegister } from "./pwa-register";
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
@@ -9,14 +10,14 @@ export async function generateMetadata(): Promise<Metadata> {
     requestHeaders.get("x-forwarded-proto") ??
     (host.startsWith("localhost") ? "http" : "https");
   const siteUrl = `${protocol}://${host}`;
-  const title = "纸上数独｜随时开始，离线也能玩";
+  const title = "纸上游戏厅｜三款轻松小游戏";
   const description =
-    "一款安静、清爽的数独 PWA，包含简单、中等和困难三种难度，支持草稿与智能高亮。";
+    "数独、合成 1024 与原创飞行小游戏，支持离线游玩并可安装到手机主屏幕。";
 
   return {
     title,
     description,
-    applicationName: "纸上数独",
+    applicationName: "纸上游戏厅",
     manifest: "/manifest.webmanifest",
     icons: {
       icon: [
@@ -28,14 +29,14 @@ export async function generateMetadata(): Promise<Metadata> {
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
-      title: "纸上数独",
+      title: "纸上游戏厅",
     },
     openGraph: {
       type: "website",
       url: siteUrl,
       title,
       description,
-      siteName: "纸上数独",
+      siteName: "纸上游戏厅",
       locale: "zh_CN",
       images: [{ url: `${siteUrl}/og.png`, width: 1731, height: 909 }],
     },
@@ -62,7 +63,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body>
+        {children}
+        <PwaRegister />
+      </body>
     </html>
   );
 }

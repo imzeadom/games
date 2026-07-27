@@ -783,3 +783,727 @@ footer {
     transition: none !important;
   }
 }
+
+/* Game hub */
+
+.hub-shell {
+  width: min(1240px, calc(100% - 48px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 26px 0 18px;
+}
+
+.hub-header {
+  margin-bottom: 0;
+}
+
+.hub-count {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.hub-hero {
+  display: grid;
+  grid-template-columns: minmax(440px, 1.5fr) minmax(260px, 0.6fr);
+  gap: 60px;
+  align-items: end;
+  padding: clamp(58px, 9vw, 105px) 3% clamp(48px, 7vw, 76px);
+}
+
+.hub-hero h1 {
+  margin: 0;
+  font-family: "STSong", "SimSun", serif;
+  font-size: clamp(48px, 6vw, 78px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.16;
+}
+
+.hub-hero > p {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.game-library {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.game-card {
+  position: relative;
+  display: flex;
+  min-height: 525px;
+  overflow: hidden;
+  flex-direction: column;
+  border: 1px solid rgb(23 35 31 / 16%);
+  padding: 18px;
+  background: var(--panel);
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 15px 40px rgb(43 54 47 / 7%);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.game-card:hover {
+  z-index: 2;
+  box-shadow: 0 24px 70px rgb(43 54 47 / 16%);
+  transform: translateY(-7px);
+}
+
+.card-topline {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px 15px;
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.card-preview {
+  position: relative;
+  display: grid;
+  min-height: 282px;
+  flex: 1;
+  overflow: hidden;
+  place-items: center;
+}
+
+.sudoku-card .card-preview {
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 58%), transparent),
+    #dfe7dc;
+}
+
+.mini-sudoku {
+  display: grid;
+  width: 195px;
+  aspect-ratio: 1;
+  grid-template-columns: repeat(4, 1fr);
+  border: 2px solid var(--ink);
+  background: var(--panel);
+  box-shadow: 12px 14px 0 rgb(23 35 31 / 9%);
+  transform: rotate(-3deg);
+}
+
+.mini-sudoku span {
+  display: grid;
+  place-items: center;
+  border-right: 1px solid rgb(23 35 31 / 36%);
+  border-bottom: 1px solid rgb(23 35 31 / 36%);
+  font-family: ui-monospace, monospace;
+  font-size: 18px;
+}
+
+.mini-sudoku span:nth-child(4n) {
+  border-right: 0;
+}
+
+.merge-card .card-preview {
+  background:
+    radial-gradient(circle at 90% 10%, rgb(255 255 255 / 22%), transparent 35%),
+    #243c35;
+}
+
+.mini-merge {
+  display: grid;
+  width: 230px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  transform: rotate(2deg);
+}
+
+.mini-merge span,
+.mini-merge strong {
+  display: grid;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 4px;
+  background: #e7dcc5;
+  color: #243c35;
+  font-family: ui-monospace, monospace;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mini-merge span:nth-child(2n) {
+  background: #cf8268;
+  color: white;
+}
+
+.mini-merge strong {
+  grid-column: span 2;
+  aspect-ratio: auto;
+  background: #f0bc62;
+  font-size: 22px;
+}
+
+.sky-card .card-preview {
+  background: url("/sky-hop-background.png") center 18% / cover;
+}
+
+.mini-sky {
+  position: absolute;
+  inset: 0;
+}
+
+.mini-sky img {
+  position: absolute;
+  z-index: 2;
+  top: 42%;
+  left: 35%;
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 12px rgb(20 61 66 / 18%));
+  transform: rotate(-7deg);
+}
+
+.cloud {
+  position: absolute;
+  width: 95px;
+  height: 26px;
+  border-radius: 999px;
+  background: #f8efd9;
+  box-shadow:
+    22px -15px 0 6px #f8efd9,
+    52px -7px 0 2px #f8efd9;
+}
+
+.cloud-one {
+  top: 24%;
+  left: -25px;
+}
+
+.cloud-two {
+  right: 32px;
+  bottom: 20%;
+  transform: scale(0.7);
+}
+
+.card-copy {
+  padding: 25px 4px 5px;
+}
+
+.card-copy h2 {
+  margin: 0 0 9px;
+  font-family: "STSong", "SimSun", serif;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.card-copy p {
+  min-height: 45px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.card-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  border-top: 1px solid rgb(23 35 31 / 14%);
+  padding-top: 14px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.card-action b {
+  font-size: 18px;
+  font-weight: 400;
+  transition: transform 150ms ease;
+}
+
+.game-card:hover .card-action b {
+  transform: translate(3px, -3px);
+}
+
+.hub-footer {
+  margin-top: 48px;
+}
+
+/* Shared game navigation */
+
+.game-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(23 35 31 / 15%);
+  padding-bottom: 18px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.back-link {
+  color: var(--ink);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
+/* 1024 */
+
+.merge-shell {
+  width: min(1080px, calc(100% - 48px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 26px 0;
+}
+
+.merge-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.62fr) minmax(430px, 1fr);
+  gap: clamp(60px, 10vw, 130px);
+  align-items: center;
+  min-height: calc(100vh - 92px);
+  padding: 38px 5%;
+}
+
+.merge-copy h1 {
+  margin: -12px 0 10px;
+  color: #243c35;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: clamp(72px, 10vw, 128px);
+  font-weight: 800;
+  letter-spacing: -0.09em;
+  line-height: 1;
+}
+
+.merge-copy > p:not(.eyebrow) {
+  max-width: 310px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.85;
+}
+
+.merge-scoreboard {
+  display: flex;
+  gap: 12px;
+  margin: 30px 0 18px;
+}
+
+.merge-scoreboard div {
+  min-width: 105px;
+  border-top: 1px solid var(--ink);
+  padding: 10px 0;
+}
+
+.merge-scoreboard span,
+.merge-scoreboard strong {
+  display: block;
+}
+
+.merge-scoreboard span {
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+.merge-scoreboard strong {
+  font-family: ui-monospace, monospace;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.compact-button {
+  width: auto;
+  min-width: 140px;
+}
+
+.merge-game {
+  width: 100%;
+  max-width: 520px;
+  justify-self: end;
+}
+
+.merge-board {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1;
+  touch-action: none;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(7px, 1.2vw, 12px);
+  border: 1px solid rgb(23 35 31 / 22%);
+  border-radius: 8px;
+  padding: clamp(10px, 1.6vw, 16px);
+  background: #a99c87;
+  box-shadow: 0 25px 70px rgb(42 50 44 / 15%);
+  user-select: none;
+}
+
+.merge-tile {
+  display: grid;
+  min-width: 0;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 5px;
+  background: rgb(255 250 239 / 24%);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: clamp(21px, 5vw, 45px);
+  font-weight: 750;
+  letter-spacing: -0.06em;
+}
+
+.merge-tile.has-value {
+  background: var(--tile-background);
+  color: var(--tile-color);
+  box-shadow: 0 4px 8px rgb(50 42 30 / 8%);
+  animation: tile-appear 130ms ease-out;
+}
+
+.merge-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.merge-hint span {
+  font-size: 17px;
+}
+
+.secondary-button {
+  width: 100%;
+  margin-bottom: 8px;
+  border: 1px solid var(--ink);
+  padding: 12px 18px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.win-modal .win-mark {
+  width: auto;
+  min-width: 64px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-family: ui-monospace, monospace;
+  font-size: 17px;
+}
+
+@keyframes tile-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.78);
+  }
+}
+
+/* Sky Hop */
+
+.sky-shell {
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 22px clamp(18px, 4vw, 52px);
+  background: #dcebe5;
+}
+
+.sky-nav {
+  position: relative;
+  z-index: 3;
+  width: min(1080px, 100%);
+  margin: 0 auto;
+}
+
+.sky-layout {
+  display: grid;
+  width: min(1000px, 100%);
+  grid-template-columns: minmax(260px, 0.65fr) minmax(360px, 0.8fr);
+  gap: clamp(60px, 10vw, 130px);
+  align-items: center;
+  margin: 0 auto;
+  padding: 34px 3% 18px;
+}
+
+.sky-copy h1 {
+  margin: 0 0 19px;
+  color: #173e47;
+  font-family: "STSong", "SimSun", serif;
+  font-size: clamp(52px, 7vw, 82px);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.sky-copy > p:not(.eyebrow) {
+  margin: 0;
+  color: #58726f;
+  font-size: 13px;
+  line-height: 1.85;
+}
+
+.sky-record {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  margin-top: 30px;
+  border-top: 1px solid rgb(23 62 71 / 25%);
+  padding-top: 12px;
+}
+
+.sky-record span {
+  color: #58726f;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.sky-record strong {
+  color: #173e47;
+  font-family: ui-monospace, monospace;
+  font-size: 30px;
+}
+
+.copyright-note {
+  margin-top: 30px;
+  border-left: 2px solid #cf6f58;
+  padding-left: 12px;
+  color: #6b7d78;
+  font-size: 9px;
+  line-height: 1.7;
+}
+
+.sky-game-frame {
+  position: relative;
+  width: min(100%, 410px);
+  justify-self: end;
+  overflow: hidden;
+  border: 6px solid #f7efd9;
+  border-radius: 30px;
+  background: #9bd3cf;
+  box-shadow:
+    0 0 0 1px rgb(23 62 71 / 30%),
+    0 30px 80px rgb(23 62 71 / 20%);
+}
+
+.sky-game-frame canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.sky-score {
+  position: absolute;
+  z-index: 4;
+  top: 19px;
+  left: 50%;
+  color: #173e47;
+  font-family: ui-monospace, monospace;
+  font-size: 36px;
+  font-weight: 800;
+  text-shadow: 0 2px #f8efd9;
+  transform: translateX(-50%);
+}
+
+.sky-overlay {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 0;
+  background: rgb(238 246 237 / 38%);
+  color: #173e47;
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+}
+
+.sky-overlay img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgb(23 62 71 / 18%));
+}
+
+.sky-overlay strong {
+  margin: 10px 0 5px;
+  font-family: "STSong", "SimSun", serif;
+  font-size: 28px;
+  letter-spacing: 0.08em;
+}
+
+.sky-overlay span {
+  color: #4e6d6a;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 900px) {
+  .hub-hero {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .hub-hero > p {
+    max-width: 470px;
+  }
+
+  .game-library {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .game-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .merge-layout,
+  .sky-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .merge-copy,
+  .sky-copy {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 24px;
+    align-items: end;
+  }
+
+  .merge-copy .eyebrow,
+  .merge-copy h1,
+  .merge-copy > p,
+  .sky-copy .eyebrow,
+  .sky-copy h1,
+  .sky-copy > p {
+    grid-column: 1;
+  }
+
+  .merge-scoreboard,
+  .sky-record {
+    grid-column: 2;
+    grid-row: 1 / 4;
+  }
+
+  .compact-button,
+  .copyright-note {
+    display: none;
+  }
+
+  .merge-game,
+  .sky-game-frame {
+    justify-self: center;
+  }
+
+  .sky-game-frame {
+    width: min(100%, 390px);
+  }
+}
+
+@media (max-width: 620px) {
+  .hub-shell {
+    width: 100%;
+    padding: 16px 14px;
+  }
+
+  .hub-count {
+    display: none;
+  }
+
+  .hub-hero {
+    padding: 38px 4px 34px;
+  }
+
+  .hub-hero h1 {
+    font-size: 38px;
+  }
+
+  .hub-hero > p {
+    font-size: 12px;
+  }
+
+  .game-library {
+    grid-template-columns: 1fr;
+  }
+
+  .game-card,
+  .game-card:last-child {
+    min-height: 460px;
+    grid-column: auto;
+  }
+
+  .card-preview {
+    min-height: 240px;
+  }
+
+  .hub-footer {
+    display: flex;
+    margin-top: 28px;
+  }
+
+  .merge-shell {
+    width: 100%;
+    padding: 16px 14px;
+  }
+
+  .merge-layout {
+    min-height: 0;
+    padding: 28px 0;
+  }
+
+  .merge-copy,
+  .sky-copy {
+    display: block;
+  }
+
+  .merge-copy h1 {
+    font-size: 68px;
+  }
+
+  .merge-copy > p:not(.eyebrow),
+  .sky-copy > p:not(.eyebrow) {
+    font-size: 11px;
+  }
+
+  .merge-scoreboard,
+  .sky-record {
+    margin: 18px 0 0;
+  }
+
+  .merge-game {
+    width: 100%;
+  }
+
+  .merge-board {
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .sky-shell {
+    padding: 14px;
+  }
+
+  .sky-layout {
+    padding: 24px 0 0;
+  }
+
+  .sky-copy h1 {
+    margin-bottom: 8px;
+    font-size: 42px;
+  }
+
+  .sky-game-frame {
+    width: min(100%, 350px);
+    border-width: 4px;
+    border-radius: 24px;
+  }
+}

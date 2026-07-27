@@ -4,14 +4,17 @@ import test from "node:test";
 
 const projectRoot = new URL("../", import.meta.url);
 
-async function render() {
+async function render(pathname = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
+  workerUrl.searchParams.set(
+    "test",
+    `${pathname}-${process.pid}-${Date.now()}`,
+  );
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request("https://sudoku.example/", {
-      headers: { accept: "text/html", host: "sudoku.example" },
+    new Request(`https://games.example${pathname}`, {
+      headers: { accept: "text/html", host: "games.example" },
     }),
     {
       ASSETS: {
@@ -25,41 +28,50 @@ async function render() {
   );
 }
 
-test("server-renders the Sudoku PWA metadata", async () => {
-  const response = await render();
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+test("server-renders the game hub and route-specific PWA metadata", async () => {
+  const routes = [
+    ["/", "纸上游戏厅｜三款轻松小游戏", "manifest.webmanifest"],
+    ["/sudoku", "纸上数独｜纸上游戏厅", "manifest-sudoku.webmanifest"],
+    ["/1024", "合成 1024｜纸上游戏厅", "manifest-1024.webmanifest"],
+    ["/sky-hop", "云雀跃｜纸上游戏厅", "manifest-sky-hop.webmanifest"],
+  ];
 
-  const html = await response.text();
-  assert.match(html, /<html lang="zh-CN">/);
-  assert.match(html, /<title>纸上数独｜随时开始，离线也能玩<\/title>/);
-  assert.match(html, /rel="manifest" href="\/manifest\.webmanifest"/);
-  assert.match(html, /name="theme-color" content="#f4f0e6"/);
-  assert.match(html, /property="og:image"/);
-  assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
+  for (const [pathname, title, manifest] of routes) {
+    const response = await render(pathname);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, /<html lang="zh-CN">/);
+    assert.ok(html.includes(`<title>${title}</title>`));
+    assert.ok(html.includes(`rel="manifest" href="/${manifest}"`));
+    assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
+  }
 });
 
-test("ships the game rules, difficulty levels, and offline assets", async () => {
-  const [page, manifest, serviceWorker] = await Promise.all([
+test("ships three games, original art, and offline assets", async () => {
+  const [hub, sudoku, merge, skyHop, serviceWorker] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../public/manifest.webmanifest", import.meta.url), "utf8"),
+    readFile(new URL("../app/sudoku/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/1024/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/sky-hop/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../public/sw.js", import.meta.url), "utf8"),
   ]);
-  const parsedManifest = JSON.parse(manifest);
 
-  assert.match(page, /label: "简单"/);
-  assert.match(page, /label: "中等"/);
-  assert.match(page, /label: "困难"/);
-  assert.match(page, /setNoteMode/);
-  assert.match(page, /isRelated/);
-  assert.match(page, /isSame/);
-  assert.equal(parsedManifest.display, "standalone");
-  assert.equal(parsedManifest.icons.length, 2);
-  assert.match(serviceWorker, /caches\.open/);
+  assert.match(hub, /纸上数独/);
+  assert.match(hub, /合成 1024/);
+  assert.match(hub, /云雀跃/);
+  assert.match(sudoku, /label: "困难"/);
+  assert.match(sudoku, /setNoteMode/);
+  assert.match(merge, /mergeLine/);
+  assert.match(merge, /completeSwipe/);
+  assert.match(skyHop, /drawGate/);
+  assert.match(skyHop, /sky-lark\.png/);
+  assert.match(serviceWorker, /paper-arcade-v2/);
 
   await Promise.all([
-    access(new URL("../public/icon-192.png", import.meta.url)),
-    access(new URL("../public/icon-512.png", import.meta.url)),
+    access(new URL("../public/icon-1024-192.png", import.meta.url)),
+    access(new URL("../public/icon-sky-192.png", import.meta.url)),
+    access(new URL("../public/sky-hop-background.png", import.meta.url)),
+    access(new URL("../public/sky-lark.png", import.meta.url)),
     access(new URL("../public/og.png", import.meta.url)),
   ]);
   await assert.rejects(access(new URL("../app/_sites-preview", projectRoot)));

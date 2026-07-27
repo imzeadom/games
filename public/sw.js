@@ -1,5 +1,22 @@
-const CACHE_NAME = "paper-sudoku-v1";
-const APP_SHELL = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
+const CACHE_NAME = "paper-arcade-v2";
+const APP_SHELL = [
+  "/",
+  "/sudoku",
+  "/1024",
+  "/sky-hop",
+  "/manifest.webmanifest",
+  "/manifest-sudoku.webmanifest",
+  "/manifest-1024.webmanifest",
+  "/manifest-sky-hop.webmanifest",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/icon-1024-192.png",
+  "/icon-1024-512.png",
+  "/icon-sky-192.png",
+  "/icon-sky-512.png",
+  "/sky-hop-background.png",
+  "/sky-lark.png"
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
