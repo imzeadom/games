@@ -44,6 +44,10 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
     assert.match(html, /<html lang="zh-CN">/);
     assert.ok(html.includes(`<title>${title}</title>`));
     assert.match(html, new RegExp(`rel="manifest"[^>]+${manifest}`));
+    assert.match(
+      html,
+      /rel="manifest"[^>]+crossorigin="use-credentials"|crossorigin="use-credentials"[^>]+rel="manifest"/,
+    );
     assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
   }
 });

@@ -43,7 +43,6 @@ export async function generateMetadata(): Promise<Metadata> {
         "max-snippet": -1,
       },
     },
-    manifest: "/manifest.webmanifest",
     icons: {
       icon: [
         { url: "/favicon.ico", sizes: "any" },
