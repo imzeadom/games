@@ -26,6 +26,11 @@ type MoveResult = {
   gained: number;
   moved: boolean;
   movements: TileMovement[];
+  mergedTargets: number[];
+};
+type TileEffects = {
+  newIndex: number | null;
+  mergedTargets: number[];
 };
 
 const STORAGE_KEY = "paper-arcade-1024";
@@ -36,15 +41,22 @@ function emptyBoard(): number[] {
 }
 
 function addTile(board: number[]): number[] {
+  return addTileWithIndex(board).board;
+}
+
+function addTileWithIndex(board: number[]): {
+  board: number[];
+  index: number | null;
+} {
   const emptyCells = board
     .map((value, index) => (value === 0 ? index : -1))
     .filter((index) => index >= 0);
-  if (emptyCells.length === 0) return board;
+  if (emptyCells.length === 0) return { board, index: null };
 
   const next = [...board];
   const target = emptyCells[Math.floor(Math.random() * emptyCells.length)];
   next[target] = Math.random() < 0.9 ? 2 : 4;
-  return next;
+  return { board: next, index: target };
 }
 
 function newGame(best = 0): MergeState {
@@ -70,6 +82,7 @@ function lineIndices(direction: Direction, line: number): number[] {
 function moveBoard(board: number[], direction: Direction): MoveResult {
   const next = emptyBoard();
   const movements: TileMovement[] = [];
+  const mergedTargets: number[] = [];
   let gained = 0;
 
   for (let line = 0; line < SIZE; line += 1) {
@@ -94,6 +107,7 @@ function moveBoard(board: number[], direction: Direction): MoveResult {
         });
         next[target] = tile.value * 2;
         gained += next[target];
+        mergedTargets.push(target);
         source += 1;
       } else {
         next[target] = tile.value;
@@ -107,6 +121,7 @@ function moveBoard(board: number[], direction: Direction): MoveResult {
     gained,
     moved: next.some((value, index) => value !== board[index]),
     movements,
+    mergedTargets,
   };
 }
 
@@ -134,11 +149,36 @@ function tileStyle(value: number): CSSProperties {
   return { "--tile-background": background, "--tile-color": color } as CSSProperties;
 }
 
+function cellOffset(position: number): string {
+  if (position === 0) return "0px";
+  const terms = Array.from(
+    { length: position },
+    () => "var(--merge-cell) + var(--merge-gap)",
+  );
+  return `calc(${terms.join(" + ")})`;
+}
+
+function movementDistance(distance: number): string {
+  if (distance === 0) return "0px";
+  const step =
+    distance > 0
+      ? "+ 100% + var(--merge-gap)"
+      : "- 100% - var(--merge-gap)";
+  return `calc(0px ${Array.from(
+    { length: Math.abs(distance) },
+    () => step,
+  ).join(" ")})`;
+}
+
 export default function Merge1024() {
   const [game, setGame] = useState<MergeState | null>(null);
   const [showWin, setShowWin] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
   const [animation, setAnimation] = useState<TileMovement[] | null>(null);
+  const [tileEffects, setTileEffects] = useState<TileEffects>({
+    newIndex: null,
+    mergedTargets: [],
+  });
   const touchStart = useRef<[number, number] | null>(null);
   const animationTimer = useRef<number | null>(null);
 
@@ -177,7 +217,8 @@ export default function Merge1024() {
 
       setAnimation(result.movements);
       animationTimer.current = window.setTimeout(() => {
-        const board = addTile(result.board);
+        const spawnedTile = addTileWithIndex(result.board);
+        const board = spawnedTile.board;
         const score = game.score + result.gained;
         const best = Math.max(game.best, score);
 
@@ -185,9 +226,13 @@ export default function Merge1024() {
         if (!hasMoves(board)) setShowGameOver(true);
 
         setGame({ ...game, board, score, best });
+        setTileEffects({
+          newIndex: spawnedTile.index,
+          mergedTargets: result.mergedTargets,
+        });
         setAnimation(null);
         animationTimer.current = null;
-      }, 170);
+      }, 210);
     },
     [animation, game],
   );
@@ -213,6 +258,7 @@ export default function Merge1024() {
     if (animationTimer.current) window.clearTimeout(animationTimer.current);
     animationTimer.current = null;
     setAnimation(null);
+    setTileEffects({ newIndex: null, mergedTargets: [] });
     setGame((current) => newGame(current?.best ?? 0));
     setShowWin(false);
     setShowGameOver(false);
@@ -284,7 +330,15 @@ export default function Merge1024() {
               <div className="merge-slot" key={index}>
                 {!animation && value !== 0 && (
                   <div
-                    className="merge-tile has-value"
+                    className={[
+                      "merge-tile has-value",
+                      tileEffects.newIndex === index ? "new-tile" : "",
+                      tileEffects.mergedTargets.includes(index)
+                        ? "merged-tile"
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                     style={tileStyle(value)}
                   >
                     {value}
@@ -301,10 +355,10 @@ export default function Merge1024() {
                   const toColumn = tile.to % SIZE;
                   const style = {
                     ...tileStyle(tile.value),
-                    "--from-row": fromRow,
-                    "--from-column": fromColumn,
-                    "--move-row": toRow - fromRow,
-                    "--move-column": toColumn - fromColumn,
+                    "--from-x": cellOffset(fromColumn),
+                    "--from-y": cellOffset(fromRow),
+                    "--move-x": movementDistance(toColumn - fromColumn),
+                    "--move-y": movementDistance(toRow - fromRow),
                   } as CSSProperties;
 
                   return (

@@ -1298,7 +1298,6 @@ footer {
   background: var(--tile-background);
   color: var(--tile-color);
   box-shadow: 0 4px 8px rgb(50 42 30 / 8%);
-  animation: tile-appear 130ms ease-out;
 }
 
 .merge-animation-layer {
@@ -1311,20 +1310,22 @@ footer {
 
 .moving-tile {
   position: absolute;
-  top: calc(var(--from-row) * (var(--merge-cell) + var(--merge-gap)));
-  left: calc(var(--from-column) * (var(--merge-cell) + var(--merge-gap)));
+  top: var(--from-y);
+  left: var(--from-x);
   width: var(--merge-cell);
   height: var(--merge-cell);
-  animation: tile-move 170ms cubic-bezier(0.22, 0.8, 0.35, 1) forwards;
+  animation: tile-move 210ms cubic-bezier(0.2, 0.72, 0.25, 1) both;
+  backface-visibility: hidden;
   will-change: transform;
 }
 
 @keyframes tile-move {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
   to {
-    transform: translate(
-      calc(var(--move-column) * (var(--merge-cell) + var(--merge-gap))),
-      calc(var(--move-row) * (var(--merge-cell) + var(--merge-gap)))
-    );
+    transform: translate3d(var(--move-x), var(--move-y), 0);
   }
 }
 
@@ -1360,10 +1361,24 @@ footer {
   font-size: 17px;
 }
 
-@keyframes tile-appear {
+.new-tile {
+  animation: tile-spawn 150ms ease-out;
+}
+
+.merged-tile {
+  animation: tile-merge 180ms ease-out;
+}
+
+@keyframes tile-spawn {
   from {
     opacity: 0;
-    transform: scale(0.78);
+    transform: scale(0.72);
+  }
+}
+
+@keyframes tile-merge {
+  50% {
+    transform: scale(1.1);
   }
 }
 

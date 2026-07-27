@@ -53,14 +53,16 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
 });
 
 test("ships animated games, original art, privacy, and discovery assets", async () => {
-  const [hub, sudoku, merge, skyHop, privacy, serviceWorker] = await Promise.all([
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/sudoku/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/1024/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/sky-hop/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/privacy/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../public/sw.js", import.meta.url), "utf8"),
-  ]);
+  const [hub, sudoku, merge, skyHop, privacy, styles, serviceWorker] =
+    await Promise.all([
+      readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/sudoku/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/1024/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/sky-hop/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/privacy/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+      readFile(new URL("../public/sw.js", import.meta.url), "utf8"),
+    ]);
 
   assert.match(hub, /纸上数独/);
   assert.match(hub, /合成 1024/);
@@ -69,7 +71,12 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(sudoku, /setNoteMode/);
   assert.match(merge, /TileMovement/);
   assert.match(merge, /moving-tile/);
+  assert.match(merge, /mergedTargets/);
+  assert.match(merge, /movementDistance/);
   assert.match(merge, /completeSwipe/);
+  assert.match(styles, /@keyframes tile-move/);
+  assert.match(styles, /@keyframes tile-merge/);
+  assert.doesNotMatch(styles, /var\(--move-column\) \*/);
   assert.match(skyHop, /drawGate/);
   assert.match(skyHop, /sky-lark\.png/);
   assert.doesNotMatch(skyHop, /next\/image/);
