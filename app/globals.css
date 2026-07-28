@@ -2048,6 +2048,34 @@ footer {
   cursor: grabbing;
 }
 
+.twilight-stage-chip {
+  position: absolute;
+  z-index: 4;
+  top: 15px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgb(9 18 37 / 35%);
+  color: #d8ddd7;
+  backdrop-filter: blur(8px);
+}
+
+.twilight-stage-chip span {
+  font-size: 7px;
+  letter-spacing: 0.1em;
+}
+
+.twilight-stage-chip strong {
+  color: #f8e4b6;
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 500;
+}
+
 .twilight-meters {
   position: absolute;
   z-index: 4;

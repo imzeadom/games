@@ -123,6 +123,12 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(twilight, /activateRocket/);
   assert.match(twilight, /lastHudSync/);
   assert.match(twilight, /endGame\(\)/);
+  assert.match(twilight, /DIFFICULTY_STAGES/);
+  assert.match(twilight, /startsAt: 270/);
+  assert.match(twilight, /difficultyStageFor/);
+  assert.match(twilight, /world\.nextGustAt/);
+  assert.match(twilight, /const deadZone = 1\.2/);
+  assert.match(twilight, /gamma \/ 12/);
   assert.match(privacy, /不接入广告、行为分析、营销追踪/);
   assert.match(site, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.match(llms, /https:\/\/games\.imzeadom\.chatgpt\.site/);

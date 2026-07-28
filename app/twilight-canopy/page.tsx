@@ -25,6 +25,7 @@ type Platform = {
   motionSpeed: number;
   blinkOffset: number;
   hitsRemaining: number;
+  challengeLevel: number;
   active: boolean;
   butterfly: boolean;
   visited: boolean;
@@ -61,6 +62,11 @@ type World = {
   milestone: number;
   lastHudSync: number;
   lastTapAt: number;
+  elapsed: number;
+  difficultyStage: number;
+  wind: number;
+  windUntil: number;
+  nextGustAt: number;
 };
 type SaveData = {
   best: string;
@@ -79,6 +85,14 @@ const GRAVITY = 1180;
 const HORIZONTAL_SPEED_MULTIPLIER = 1.5;
 const STORAGE_KEY = "paper-arcade-twilight-canopy";
 const PENTATONIC = [261.63, 293.66, 329.63, 392, 440];
+const DIFFICULTY_STAGES = [
+  { startsAt: 0, label: "林梢热身" },
+  { startsAt: 45, label: "风枝摇曳" },
+  { startsAt: 90, label: "碎叶试炼" },
+  { startsAt: 150, label: "星隐时刻" },
+  { startsAt: 210, label: "疾风高塔" },
+  { startsAt: 270, label: "极光冲刺" },
+] as const;
 
 const DEFAULT_SAVE: SaveData = {
   best: "0",
@@ -133,6 +147,7 @@ function makePlatform(
   butterfly = false,
   segments: Platform["segments"] = 1,
   behavior: PlatformBehavior = "static",
+  challengeLevel = 0,
 ): Platform {
   return {
     id,
@@ -145,10 +160,18 @@ function makePlatform(
     behavior,
     motionAmplitude:
       behavior === "moving" ? 34 + seededNoise(id + 41) * 42 : 0,
-    motionSpeed: 0.65 + seededNoise(id + 47) * 0.65,
+    motionSpeed:
+      0.65 + seededNoise(id + 47) * 0.65 + challengeLevel * 0.08,
     blinkOffset: seededNoise(id + 53) * 3.4,
     hitsRemaining:
-      behavior === "fragile" ? 2 + (id % 2) : behavior === "bell" ? 1 : 99,
+      behavior === "fragile"
+        ? challengeLevel >= 4
+          ? 1 + (id % 2)
+          : 2 + (id % 2)
+        : behavior === "bell"
+          ? 1
+          : 99,
+    challengeLevel,
     active: true,
     butterfly,
     visited: false,
@@ -187,6 +210,11 @@ function initialWorld(): World {
     milestone: 0,
     lastHudSync: 0,
     lastTapAt: 0,
+    elapsed: 0,
+    difficultyStage: 0,
+    wind: 0,
+    windUntil: 0,
+    nextGustAt: 105,
   };
 }
 
@@ -195,26 +223,57 @@ function seededNoise(value: number) {
   return sine - Math.floor(sine);
 }
 
+function difficultyStageFor(elapsed: number) {
+  let stage = 0;
+  for (let index = 1; index < DIFFICULTY_STAGES.length; index += 1) {
+    if (elapsed >= DIFFICULTY_STAGES[index].startsAt) stage = index;
+  }
+  return stage;
+}
+
+function formatRunTime(totalSeconds: number) {
+  const minutes = Math.floor(totalSeconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const seconds = Math.floor(totalSeconds % 60)
+    .toString()
+    .padStart(2, "0");
+  return `${minutes}:${seconds}`;
+}
+
 function generateAhead(world: World) {
   let highest = world.platforms.at(-1);
   if (!highest) return;
 
   while (highest.y < world.cameraY + HEIGHT + 520) {
     const altitude = highest.y;
+    const stage = world.difficultyStage;
     const cycle = altitude % 1500;
     const release = cycle > 980;
     const tension = cycle > 520 && cycle <= 980;
-    const difficulty = Math.min(1, altitude / 7200);
+    const difficulty = Math.min(
+      1,
+      Math.max(altitude / 9000, (stage / 5) * 0.88),
+    );
     const corridorCycle = altitude % 2600;
     const bellCorridor =
-      altitude > 1800 && corridorCycle >= 1750 && corridorCycle < 2170;
+      stage >= 2 &&
+      altitude > 1800 &&
+      corridorCycle >= 1750 &&
+      corridorCycle < 2170;
     const gap = bellCorridor
       ? 68 + seededNoise(world.nextPlatformId + 2) * 10
       : release
-      ? 118 + seededNoise(world.nextPlatformId) * 26
-      : tension
-        ? 148 + difficulty * 28 + seededNoise(world.nextPlatformId) * 20
-        : 132 + difficulty * 18 + seededNoise(world.nextPlatformId) * 24;
+        ? 118 + stage * 1.5 + seededNoise(world.nextPlatformId) * 26
+        : tension
+          ? 146 +
+            difficulty * 26 +
+            stage * 2.4 +
+            seededNoise(world.nextPlatformId) * 18
+          : 130 +
+            difficulty * 17 +
+            stage * 1.8 +
+            seededNoise(world.nextPlatformId) * 22;
     const doublePlatform =
       !bellCorridor &&
       (world.nextPlatformId % 9 === 0 ||
@@ -225,6 +284,7 @@ function generateAhead(world: World) {
           68,
           101 -
             difficulty * 18 -
+            stage * 2 -
             (tension ? 7 : 0) +
             seededNoise(world.nextPlatformId + 7) * 20,
         );
@@ -233,7 +293,11 @@ function generateAhead(world: World) {
       : doublePlatform
         ? Math.min(146, singleWidth * 1.58)
         : singleWidth;
-    const maxShift = bellCorridor ? 76 : release ? 155 : 205;
+    const maxShift = bellCorridor
+      ? 76
+      : release
+        ? 155 + stage * 3
+        : 190 + stage * 5;
     const shift =
       (seededNoise(world.nextPlatformId + 11) * 2 - 1) * maxShift;
     const x = Math.max(14, Math.min(WIDTH - width - 14, highest.x + shift));
@@ -242,13 +306,16 @@ function generateAhead(world: World) {
       ((release && world.nextPlatformId % 3 === 0) ||
         seededNoise(world.nextPlatformId + 17) > 0.91);
     const behaviorRoll = seededNoise(world.nextPlatformId + 61);
+    const blinkChance = stage >= 3 ? 0.1 + (stage - 3) * 0.05 : 0;
+    const fragileChance = stage >= 2 ? 0.12 + (stage - 2) * 0.04 : 0;
+    const movingChance = stage >= 1 ? 0.16 + (stage - 1) * 0.04 : 0;
     const behavior: PlatformBehavior = bellCorridor
       ? "bell"
-      : altitude > 3600 && behaviorRoll > 0.8
+      : behaviorRoll < blinkChance
         ? "blinking"
-        : altitude > 2300 && behaviorRoll > 0.63
+        : behaviorRoll < blinkChance + fragileChance
           ? "fragile"
-          : altitude > 1100 && behaviorRoll > 0.46
+          : behaviorRoll < blinkChance + fragileChance + movingChance
             ? "moving"
             : "static";
     const platform = makePlatform(
@@ -264,6 +331,7 @@ function generateAhead(world: World) {
       butterfly,
       doublePlatform ? 2 : 1,
       behavior,
+      stage,
     );
     world.platforms.push(platform);
     world.nextPlatformId += 1;
@@ -299,10 +367,16 @@ function addBurst(
 function platformOpacity(platform: Platform, timestamp: number) {
   if (!platform.active) return 0;
   if (platform.behavior !== "blinking") return 1;
-  const phase = (timestamp / 1000 + platform.blinkOffset) % 3.4;
-  if (phase < 1.85) return 1;
-  if (phase < 2.18) return 1 - ((phase - 1.85) / 0.33) * 0.9;
-  if (phase > 3.05) return 0.1 + ((phase - 3.05) / 0.35) * 0.9;
+  const cycle = Math.max(2.35, 3.4 - platform.challengeLevel * 0.16);
+  const visibleUntil = Math.max(1.15, 1.85 - platform.challengeLevel * 0.08);
+  const phase = (timestamp / 1000 + platform.blinkOffset) % cycle;
+  if (phase < visibleUntil) return 1;
+  if (phase < visibleUntil + 0.3) {
+    return 1 - ((phase - visibleUntil) / 0.3) * 0.9;
+  }
+  if (phase > cycle - 0.3) {
+    return 0.1 + ((phase - (cycle - 0.3)) / 0.3) * 0.9;
+  }
   return 0.1;
 }
 
@@ -501,6 +575,29 @@ function drawBackground(
     0.09,
     1.25,
   );
+
+  if (world.windUntil > world.elapsed && world.wind !== 0) {
+    context.save();
+    context.globalAlpha = 0.16 + world.difficultyStage * 0.025;
+    context.strokeStyle = "#e6f5e9";
+    context.lineWidth = 2;
+    const direction = Math.sign(world.wind);
+    for (let index = 0; index < 13; index += 1) {
+      const travel = (timestamp * (0.22 + index * 0.006)) % (WIDTH + 180);
+      const x = direction > 0 ? travel - 140 : WIDTH + 140 - travel;
+      const y = 70 + ((index * 67 + world.cameraY * 0.11) % (HEIGHT - 120));
+      context.beginPath();
+      context.moveTo(x, y);
+      context.quadraticCurveTo(
+        x - direction * 34,
+        y - 5,
+        x - direction * 78,
+        y + 2,
+      );
+      context.stroke();
+    }
+    context.restore();
+  }
 
   context.globalAlpha = 0.3;
   const canopyColor = theme === "lagoon" ? "#062f40" : "#172f31";
@@ -905,6 +1002,8 @@ export default function TwilightCanopy() {
   const [score, setScore] = useState("0");
   const [combo, setCombo] = useState(0);
   const [height, setHeight] = useState(0);
+  const [runTime, setRunTime] = useState("00:00");
+  const [difficultyStage, setDifficultyStage] = useState(0);
   const [glide, setGlide] = useState(100);
   const [rocket, setRocket] = useState(0);
   const [shield, setShield] = useState(0);
@@ -921,6 +1020,8 @@ export default function TwilightCanopy() {
     setScore(formatScore(world.score));
     setCombo(world.combo);
     setHeight(Math.floor(world.maxHeight / 10));
+    setRunTime(formatRunTime(world.elapsed));
+    setDifficultyStage(world.difficultyStage);
     setGlide(Math.round(world.glide));
     setRocket(Math.round(world.rocket));
     setShield(Math.round(world.shield));
@@ -995,11 +1096,11 @@ export default function TwilightCanopy() {
 
     const onOrientation = (event: DeviceOrientationEvent) => {
       const gamma = event.gamma ?? 0;
-      const deadZone = 3;
+      const deadZone = 1.2;
       input.tilt =
         Math.abs(gamma) <= deadZone
           ? 0
-          : Math.max(-1, Math.min(1, gamma / 22));
+          : Math.max(-1, Math.min(1, gamma / 12));
     };
     window.addEventListener("deviceorientation", onOrientation);
     return () => {
@@ -1211,6 +1312,46 @@ export default function TwilightCanopy() {
 
       if (playing && delta > 0) {
         const player = world.player;
+        world.elapsed += delta;
+        const nextDifficultyStage = difficultyStageFor(world.elapsed);
+        if (nextDifficultyStage !== world.difficultyStage) {
+          world.difficultyStage = nextDifficultyStage;
+          const stageName = DIFFICULTY_STAGES[nextDifficultyStage].label;
+          world.toast = {
+            text: `难度提升 · ${stageName}`,
+            until: timestamp + 1700,
+          };
+          addBurst(
+            world,
+            WIDTH / 2,
+            world.cameraY + HEIGHT - 100,
+            "#dce9ff",
+            30,
+          );
+          chime(world.combo, true);
+          syncHud();
+        }
+
+        if (
+          world.difficultyStage >= 2 &&
+          world.elapsed >= world.nextGustAt
+        ) {
+          const gustSeed = Math.floor(world.elapsed) + world.jumps * 7;
+          const direction = seededNoise(gustSeed) > 0.5 ? 1 : -1;
+          world.wind =
+            direction * (120 + world.difficultyStage * 34);
+          world.windUntil =
+            world.elapsed + Math.max(1.35, 2.45 - world.difficultyStage * 0.16);
+          world.nextGustAt =
+            world.elapsed + Math.max(7, 14 - world.difficultyStage * 1.15);
+          world.toast = {
+            text: direction > 0 ? "疾风从左侧吹来" : "疾风从右侧吹来",
+            until: timestamp + 1050,
+          };
+          syncHud();
+        }
+        if (world.windUntil <= world.elapsed) world.wind = 0;
+
         const previousY = player.y;
         const descending = player.vy < 0;
         const gliding = descending && input.glide && world.glide > 0;
@@ -1229,6 +1370,9 @@ export default function TwilightCanopy() {
         const maxSpeed =
           (gliding ? 350 : 275) * HORIZONTAL_SPEED_MULTIPLIER;
         player.vx = Math.max(-maxSpeed, Math.min(maxSpeed, player.vx));
+        if (world.wind !== 0 && world.windUntil > world.elapsed) {
+          player.vx += world.wind * delta;
+        }
 
         const gravity = rocketActive
           ? GRAVITY * 0.12
@@ -1401,7 +1545,17 @@ export default function TwilightCanopy() {
         world.cameraY += (targetCamera - world.cameraY) * Math.min(1, delta * 4.8);
         generateAhead(world);
 
-        const currentBand = Math.floor(world.cameraY / 1000);
+        const rescueSpan =
+          world.difficultyStage >= 5
+            ? Number.POSITIVE_INFINITY
+            : world.difficultyStage >= 4
+              ? 1900
+              : world.difficultyStage >= 3
+                ? 1400
+                : 1000;
+        const currentBand = Number.isFinite(rescueSpan)
+          ? Math.floor(world.cameraY / rescueSpan)
+          : -99;
         if (player.y < world.cameraY - 82) {
           const nearest = world.platforms
             .filter((platform) => platform.y > world.cameraY + 100)
@@ -1679,6 +1833,11 @@ export default function TwilightCanopy() {
               onPointerCancel={pointerUp}
             />
 
+            <div className="twilight-stage-chip" aria-live="polite">
+              <span>{DIFFICULTY_STAGES[difficultyStage].label}</span>
+              <strong>{runTime}</strong>
+            </div>
+
             <div className="twilight-meters" aria-label="能力状态">
               <div>
                 <span>翼风</span>
@@ -1730,7 +1889,7 @@ export default function TwilightCanopy() {
                 )}
                 {phase === "over" && (
                   <small>
-                    本程星分 {score} · 高度 {height} m
+                    本程 {runTime} · 星分 {score} · 高度 {height} m
                   </small>
                 )}
               </div>
