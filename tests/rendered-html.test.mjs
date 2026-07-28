@@ -53,13 +53,15 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
 });
 
 test("ships animated games, original art, privacy, and discovery assets", async () => {
-  const [hub, sudoku, merge, skyHop, privacy, styles, serviceWorker] =
+  const [hub, sudoku, merge, skyHop, privacy, site, llms, styles, serviceWorker] =
     await Promise.all([
       readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/sudoku/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/1024/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/sky-hop/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/privacy/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/site.ts", import.meta.url), "utf8"),
+      readFile(new URL("../public/llms.txt", import.meta.url), "utf8"),
       readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
       readFile(new URL("../public/sw.js", import.meta.url), "utf8"),
     ]);
@@ -81,6 +83,9 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(skyHop, /sky-lark\.png/);
   assert.doesNotMatch(skyHop, /next\/image/);
   assert.match(privacy, /不接入广告、行为分析、营销追踪/);
+  assert.match(site, /https:\/\/games\.imzeadom\.chatgpt\.site/);
+  assert.match(llms, /https:\/\/games\.imzeadom\.chatgpt\.site/);
+  assert.doesNotMatch(llms, /paper-sudoku-games/);
   assert.match(serviceWorker, /paper-arcade-v3/);
 
   await Promise.all([
