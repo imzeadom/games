@@ -30,10 +30,15 @@ async function render(pathname = "/") {
 
 test("server-renders the game hub and route-specific PWA metadata", async () => {
   const routes = [
-    ["/", "纸上游戏厅｜三款轻松小游戏", "manifest.webmanifest"],
+    ["/", "纸上游戏厅｜四款轻松小游戏", "manifest.webmanifest"],
     ["/sudoku", "纸上数独｜纸上游戏厅", "manifest-sudoku.webmanifest"],
     ["/1024", "合成 1024｜纸上游戏厅", "manifest-1024.webmanifest"],
     ["/sky-hop", "云雀跃｜纸上游戏厅", "manifest-sky-hop.webmanifest"],
+    [
+      "/twilight-canopy",
+      "暮色拾星｜纸上游戏厅",
+      "manifest-twilight.webmanifest",
+    ],
     ["/privacy", "隐私说明｜纸上游戏厅", "manifest.webmanifest"],
   ];
 
@@ -53,12 +58,27 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
 });
 
 test("ships animated games, original art, privacy, and discovery assets", async () => {
-  const [hub, sudoku, merge, skyHop, privacy, site, llms, styles, serviceWorker] =
+  const [
+    hub,
+    sudoku,
+    merge,
+    skyHop,
+    twilight,
+    privacy,
+    site,
+    llms,
+    styles,
+    serviceWorker,
+  ] =
     await Promise.all([
       readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/sudoku/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/1024/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/sky-hop/page.tsx", import.meta.url), "utf8"),
+      readFile(
+        new URL("../app/twilight-canopy/page.tsx", import.meta.url),
+        "utf8",
+      ),
       readFile(new URL("../app/privacy/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/site.ts", import.meta.url), "utf8"),
       readFile(new URL("../public/llms.txt", import.meta.url), "utf8"),
@@ -69,6 +89,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(hub, /纸上数独/);
   assert.match(hub, /合成 1024/);
   assert.match(hub, /云雀跃/);
+  assert.match(hub, /暮色拾星/);
   assert.match(sudoku, /label: "困难"/);
   assert.match(sudoku, /setNoteMode/);
   assert.match(merge, /TileMovement/);
@@ -82,11 +103,32 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(skyHop, /drawGate/);
   assert.match(skyHop, /sky-lark\.png/);
   assert.doesNotMatch(skyHop, /next\/image/);
+  assert.match(twilight, /generateAhead/);
+  assert.match(twilight, /bufferedUntil/);
+  assert.match(twilight, /world\.glide/);
+  assert.match(twilight, /world\.rescueBand/);
+  assert.match(twilight, /fib\(world\.combo\)/);
+  assert.match(twilight, /灵蝶相伴 · 总分 ×2/);
+  assert.match(twilight, /unlockedThemes/);
+  assert.match(twilight, /const BOUNCE_SPEED = 710/);
+  assert.match(twilight, /HORIZONTAL_SPEED_MULTIPLIER = 1\.5/);
+  assert.match(twilight, /doublePlatform/);
+  assert.match(twilight, /requestFullscreen/);
+  assert.match(twilight, /DeviceOrientationEvent/);
+  assert.match(twilight, /PlatformBehavior/);
+  assert.match(twilight, /behavior === "moving"/);
+  assert.match(twilight, /platform\.behavior !== "blinking"/);
+  assert.match(twilight, /behavior === "fragile"/);
+  assert.match(twilight, /behavior === "bell"/);
+  assert.match(twilight, /activateRocket/);
+  assert.match(twilight, /lastHudSync/);
+  assert.match(twilight, /endGame\(\)/);
   assert.match(privacy, /不接入广告、行为分析、营销追踪/);
   assert.match(site, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.match(llms, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.doesNotMatch(llms, /paper-sudoku-games/);
-  assert.match(serviceWorker, /paper-arcade-v3/);
+  assert.match(serviceWorker, /paper-arcade-v4/);
+  assert.match(serviceWorker, /twilight-canopy/);
 
   await Promise.all([
     access(new URL("../public/icon-1024-192.png", import.meta.url)),

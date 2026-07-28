@@ -858,7 +858,7 @@ footer {
 
 .game-library {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 18px;
 }
 
@@ -1015,6 +1015,111 @@ footer {
   right: 32px;
   bottom: 20%;
   transform: scale(0.7);
+}
+
+.twilight-card .card-preview {
+  background:
+    radial-gradient(circle at 68% 16%, rgb(255 236 180 / 75%) 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 29%, rgb(255 245 210 / 54%) 0 1px, transparent 2px),
+    linear-gradient(165deg, #da8d78 0%, #6d617c 48%, #213b53 100%);
+}
+
+.mini-twilight {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.mini-moon {
+  position: absolute;
+  top: 24px;
+  right: 31px;
+  color: #ffefb3;
+  font-family: Georgia, serif;
+  font-size: 35px;
+  text-shadow: 0 0 18px rgb(255 230 148 / 70%);
+}
+
+.mini-leaf {
+  position: absolute;
+  width: 142px;
+  height: 34px;
+  border-radius: 90% 10% 90% 10%;
+  background: linear-gradient(110deg, #8cb68c, #315f5b);
+  box-shadow: 0 8px 24px rgb(13 38 42 / 28%);
+  transform: skewX(-14deg);
+}
+
+.leaf-a {
+  top: 42%;
+  left: -18px;
+}
+
+.leaf-b {
+  right: -32px;
+  bottom: 15%;
+  transform: scale(0.78) rotate(180deg) skewX(-14deg);
+}
+
+.mini-lantern {
+  position: absolute;
+  top: 28%;
+  left: 53%;
+  width: 82px;
+  height: 27px;
+  background: linear-gradient(#ffe7a5, #d77664);
+  box-shadow: 0 0 25px rgb(255 213 133 / 55%);
+  clip-path: polygon(0 0, 100% 0, 86% 100%, 14% 100%);
+}
+
+.mini-squirrel {
+  position: absolute;
+  z-index: 2;
+  top: 49%;
+  left: 44%;
+  width: 32px;
+  height: 44px;
+  border-radius: 55% 55% 48% 48%;
+  background: #a9573d;
+  box-shadow:
+    -22px 7px 0 -8px #dc956f,
+    22px 7px 0 -8px #dc956f,
+    0 9px 18px rgb(19 23 40 / 26%);
+  transform: rotate(-8deg);
+}
+
+.mini-squirrel::before {
+  position: absolute;
+  top: -14px;
+  left: 5px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #a9573d;
+  content: "";
+}
+
+.mini-squirrel::after {
+  position: absolute;
+  top: 26px;
+  left: 24px;
+  width: 28px;
+  height: 15px;
+  border: 7px solid #a9573d;
+  border-left: 0;
+  border-radius: 0 100% 100% 0;
+  content: "";
+  transform: rotate(-20deg);
+}
+
+.mini-butterfly {
+  position: absolute;
+  top: 23%;
+  left: 30%;
+  color: #9cecff;
+  font-size: 15px;
+  text-shadow: 0 0 16px #70e3ff;
+  transform: rotate(45deg);
 }
 
 .card-copy {
@@ -1537,10 +1642,6 @@ footer {
     grid-template-columns: 1fr 1fr;
   }
 
-  .game-card:last-child {
-    grid-column: 1 / -1;
-  }
-
   .merge-layout,
   .sky-layout {
     grid-template-columns: 1fr;
@@ -1702,5 +1803,729 @@ footer {
     width: min(100%, 350px);
     border-width: 4px;
     border-radius: 24px;
+  }
+}
+
+/* Twilight Canopy */
+
+.twilight-shell {
+  --twilight-ink: #f8edd8;
+  --twilight-muted: #bdc7c2;
+  --twilight-line: rgb(238 231 211 / 17%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding: 20px clamp(16px, 3vw, 42px) 34px;
+  background:
+    radial-gradient(circle at 18% 24%, rgb(214 117 95 / 16%), transparent 34rem),
+    radial-gradient(circle at 78% 12%, rgb(111 151 161 / 14%), transparent 28rem),
+    #101a2d;
+  color: var(--twilight-ink);
+}
+
+.twilight-nav {
+  position: relative;
+  z-index: 6;
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  border-color: var(--twilight-line);
+  color: var(--twilight-muted);
+}
+
+.twilight-nav .back-link {
+  color: var(--twilight-ink);
+}
+
+.twilight-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.twilight-nav-actions button {
+  border: 1px solid var(--twilight-line);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgb(255 255 255 / 4%);
+  color: var(--twilight-muted);
+  cursor: pointer;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.twilight-nav-actions button:hover:not(:disabled) {
+  border-color: rgb(238 231 211 / 42%);
+  color: var(--twilight-ink);
+}
+
+.twilight-nav-actions button:disabled {
+  cursor: default;
+  opacity: 0.42;
+}
+
+.twilight-nav-actions strong {
+  margin-left: 5px;
+  color: #ffe3a5;
+  font-family: ui-monospace, monospace;
+}
+
+.twilight-layout {
+  display: grid;
+  width: min(1110px, 100%);
+  grid-template-columns: minmax(250px, 0.68fr) minmax(410px, 0.96fr);
+  gap: clamp(60px, 9vw, 128px);
+  align-items: center;
+  margin: 0 auto;
+  padding: 32px 2% 4px;
+}
+
+.twilight-copy {
+  position: relative;
+}
+
+.twilight-kicker {
+  margin: 0 0 14px;
+  color: #e7a986;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+}
+
+.twilight-copy h1 {
+  margin: 0;
+  font-family: "STSong", "SimSun", serif;
+  font-size: clamp(52px, 6.7vw, 88px);
+  font-weight: 400;
+  letter-spacing: 0.09em;
+  line-height: 1.08;
+  text-shadow: 0 14px 40px rgb(0 0 0 / 20%);
+}
+
+.twilight-intro {
+  max-width: 370px;
+  margin: 24px 0 0;
+  color: var(--twilight-muted);
+  font-family: "STSong", "SimSun", serif;
+  font-size: 14px;
+  line-height: 2;
+}
+
+.twilight-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 340px;
+  margin: 34px 0 0;
+  border-top: 1px solid var(--twilight-line);
+  border-bottom: 1px solid var(--twilight-line);
+}
+
+.twilight-stats div {
+  padding: 15px 0 16px;
+}
+
+.twilight-stats div + div {
+  border-left: 1px solid var(--twilight-line);
+  padding-left: 22px;
+}
+
+.twilight-stats dt {
+  margin-bottom: 5px;
+  color: #8fa29f;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+}
+
+.twilight-stats dd {
+  margin: 0;
+  color: #f7deb0;
+  font-family: ui-monospace, monospace;
+  font-size: 17px;
+}
+
+.twilight-guide {
+  display: grid;
+  gap: 9px;
+  margin-top: 28px;
+  color: #8fa29f;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+
+.twilight-guide span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.twilight-guide kbd {
+  min-width: 24px;
+  border: 1px solid rgb(238 231 211 / 22%);
+  border-radius: 4px;
+  padding: 3px 5px;
+  background: rgb(255 255 255 / 4%);
+  color: #d9d8ce;
+  font-family: ui-monospace, monospace;
+  text-align: center;
+}
+
+.twilight-game-column {
+  width: min(100%, 470px);
+  justify-self: end;
+}
+
+.twilight-hud {
+  display: grid;
+  grid-template-columns: 1.5fr 0.7fr 0.55fr;
+  gap: 12px;
+  align-items: end;
+  margin: 0 4px 10px;
+}
+
+.twilight-hud > div {
+  border-left: 1px solid var(--twilight-line);
+  padding-left: 11px;
+}
+
+.twilight-hud span,
+.twilight-hud strong {
+  display: block;
+}
+
+.twilight-hud span {
+  margin-bottom: 2px;
+  color: #8fa29f;
+  font-size: 7px;
+  letter-spacing: 0.12em;
+}
+
+.twilight-hud strong {
+  overflow: hidden;
+  color: #f8e4b6;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.twilight-score strong {
+  font-size: 21px;
+}
+
+.twilight-frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(244 224 189 / 34%);
+  border-radius: 25px;
+  background: #25395d;
+  box-shadow:
+    0 0 0 7px rgb(244 224 189 / 4%),
+    0 34px 90px rgb(0 0 0 / 34%);
+}
+
+.twilight-frame::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 55px rgb(10 18 34 / 28%),
+    inset 0 0 0 1px rgb(255 255 255 / 5%);
+  content: "";
+  pointer-events: none;
+}
+
+.twilight-frame canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.twilight-frame canvas:active {
+  cursor: grabbing;
+}
+
+.twilight-meters {
+  position: absolute;
+  z-index: 4;
+  right: 17px;
+  bottom: 15px;
+  display: grid;
+  width: 112px;
+  gap: 6px;
+  padding: 9px 10px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 9px;
+  background: rgb(9 18 37 / 38%);
+  backdrop-filter: blur(8px);
+}
+
+.twilight-meters > div {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 7px;
+  align-items: center;
+}
+
+.twilight-meters span {
+  color: #d8ddd7;
+  font-size: 7px;
+  letter-spacing: 0.1em;
+}
+
+.twilight-meters i {
+  display: block;
+  overflow: hidden;
+  height: 3px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 14%);
+}
+
+.twilight-meters b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #b5e4cc;
+  box-shadow: 0 0 8px #9edabd;
+  transition: width 120ms linear;
+}
+
+.twilight-meters .shield-meter b {
+  background: #f7deab;
+  box-shadow: 0 0 8px #f7d993;
+}
+
+.twilight-meters .rocket-meter b {
+  background: linear-gradient(90deg, #f4a36a, #ffe485);
+  box-shadow: 0 0 9px #f6b960;
+}
+
+.twilight-toast {
+  position: absolute;
+  z-index: 5;
+  top: 82px;
+  left: 50%;
+  border: 1px solid rgb(255 240 205 / 24%);
+  border-radius: 999px;
+  padding: 8px 13px;
+  background: rgb(20 29 52 / 62%);
+  color: #fff0c8;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: twilight-toast 280ms ease-out;
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+@keyframes twilight-toast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}
+
+.twilight-overlay {
+  position: absolute;
+  z-index: 7;
+  display: flex;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 50% 43%, rgb(226 164 123 / 18%), transparent 30%),
+    rgb(15 26 48 / 46%);
+  backdrop-filter: blur(3px);
+}
+
+.overlay-star {
+  color: #ffe7a5;
+  font-family: Georgia, serif;
+  font-size: 42px;
+  text-shadow: 0 0 30px rgb(255 224 145 / 72%);
+  animation: twilight-star 2.8s ease-in-out infinite;
+}
+
+@keyframes twilight-star {
+  50% {
+    opacity: 0.7;
+    transform: scale(0.85) rotate(18deg);
+  }
+}
+
+.twilight-overlay p {
+  margin: 16px 0 22px;
+  font-family: "STSong", "SimSun", serif;
+  font-size: 25px;
+  letter-spacing: 0.12em;
+}
+
+.twilight-overlay button {
+  border: 1px solid rgb(255 237 200 / 68%);
+  border-radius: 999px;
+  padding: 12px 25px;
+  background: rgb(247 222 171 / 92%);
+  color: #202c45;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 18%);
+}
+
+.twilight-overlay button:hover {
+  background: #fff0c9;
+  transform: translateY(-1px);
+}
+
+.twilight-overlay small {
+  margin-top: 12px;
+  color: #b9c4c1;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+}
+
+.twilight-mobile-controls {
+  display: none;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.twilight-mobile-controls button {
+  border: 1px solid var(--twilight-line);
+  border-radius: 10px;
+  padding: 12px 7px;
+  background: rgb(255 255 255 / 5%);
+  color: #c7d0cc;
+  touch-action: none;
+  user-select: none;
+  font-size: 9px;
+}
+
+.twilight-mobile-controls .glide-button {
+  border-color: rgb(238 207 151 / 30%);
+  background: rgb(238 207 151 / 10%);
+  color: #f2ddb4;
+}
+
+.twilight-mobile-features {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.twilight-mobile-features button {
+  border: 1px solid var(--twilight-line);
+  border-radius: 999px;
+  padding: 10px 9px;
+  background: rgb(255 255 255 / 4%);
+  color: #aebdb8;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.twilight-mobile-features button.is-active {
+  border-color: rgb(181 228 204 / 42%);
+  background: rgb(181 228 204 / 12%);
+  color: #c9f0dd;
+}
+
+.twilight-game-column:is(:fullscreen, .is-pseudo-fullscreen) {
+  display: grid;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 7px;
+  padding:
+    max(9px, env(safe-area-inset-top))
+    max(9px, env(safe-area-inset-right))
+    max(9px, env(safe-area-inset-bottom))
+    max(9px, env(safe-area-inset-left));
+  background:
+    radial-gradient(circle at 50% 12%, rgb(193 133 122 / 15%), transparent 38rem),
+    #0d182b;
+}
+
+.twilight-game-column.is-pseudo-fullscreen {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+}
+
+.twilight-game-column:fullscreen::backdrop {
+  background: #0d182b;
+}
+
+.twilight-game-column:is(:fullscreen, .is-pseudo-fullscreen) .twilight-hud {
+  width: min(100%, 480px);
+  margin: 0 auto;
+}
+
+.twilight-game-column:is(:fullscreen, .is-pseudo-fullscreen) .twilight-frame {
+  width: min(100%, 480px);
+  height: 100%;
+  min-height: 0;
+  justify-self: center;
+  border-radius: 18px;
+}
+
+.twilight-game-column:is(:fullscreen, .is-pseudo-fullscreen) .twilight-frame canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.twilight-game-column:is(:fullscreen, .is-pseudo-fullscreen)
+  .twilight-mobile-controls,
+.twilight-game-column:is(:fullscreen, .is-pseudo-fullscreen)
+  .twilight-mobile-features {
+  display: grid;
+  width: min(100%, 480px);
+  margin: 0 auto;
+}
+
+.twilight-modal-backdrop {
+  position: fixed;
+  z-index: 100;
+  display: grid;
+  inset: 0;
+  place-items: center;
+  padding: 20px;
+  background: rgb(5 10 22 / 68%);
+  backdrop-filter: blur(12px);
+}
+
+.twilight-collection {
+  position: relative;
+  width: min(650px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  border: 1px solid rgb(244 224 189 / 24%);
+  border-radius: 20px;
+  padding: 34px;
+  background:
+    radial-gradient(circle at 100% 0, rgb(196 131 120 / 15%), transparent 22rem),
+    #16243d;
+  box-shadow: 0 34px 100px rgb(0 0 0 / 48%);
+  color: var(--twilight-ink);
+}
+
+.twilight-modal-close {
+  position: absolute;
+  top: 17px;
+  right: 19px;
+  border: 0;
+  background: transparent;
+  color: #c7d0cc;
+  cursor: pointer;
+  font-size: 26px;
+}
+
+.twilight-collection h2 {
+  margin: 0;
+  font-family: "STSong", "SimSun", serif;
+  font-size: 34px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.collection-balance {
+  margin: 10px 0 28px;
+  color: #93a5a2;
+  font-size: 10px;
+}
+
+.collection-balance strong {
+  margin-left: 5px;
+  color: #ffe3a5;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+}
+
+.twilight-collection h3 {
+  margin: 22px 0 10px;
+  color: #c7d0cc;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.collection-grid button {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 28px 1fr;
+  gap: 2px 9px;
+  align-items: center;
+  border: 1px solid var(--twilight-line);
+  border-radius: 10px;
+  padding: 10px;
+  background: rgb(255 255 255 / 3%);
+  color: #d8ddd7;
+  cursor: pointer;
+  text-align: left;
+}
+
+.collection-grid button:hover:not(:disabled),
+.collection-grid button.is-selected {
+  border-color: rgb(244 224 189 / 48%);
+  background: rgb(244 224 189 / 8%);
+}
+
+.collection-grid button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.collection-grid i {
+  width: 28px;
+  height: 28px;
+  grid-row: 1 / 3;
+  border: 1px solid rgb(255 255 255 / 23%);
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgb(255 255 255 / 8%);
+}
+
+.collection-grid span {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collection-grid small {
+  color: #93a5a2;
+  font-size: 8px;
+}
+
+.collection-note {
+  margin: 25px 0 0;
+  border-top: 1px solid var(--twilight-line);
+  padding-top: 15px;
+  color: #93a5a2;
+  font-size: 9px;
+  line-height: 1.7;
+}
+
+@media (max-width: 1040px) {
+  .game-library {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .twilight-layout {
+    grid-template-columns: 1fr;
+    gap: 26px;
+    padding-top: 34px;
+  }
+
+  .twilight-copy {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 28px;
+    align-items: end;
+  }
+
+  .twilight-kicker,
+  .twilight-copy h1,
+  .twilight-intro {
+    grid-column: 1;
+  }
+
+  .twilight-stats {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    min-width: 230px;
+  }
+
+  .twilight-guide {
+    display: none;
+  }
+
+  .twilight-game-column {
+    width: min(100%, 450px);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 620px) {
+  .twilight-shell {
+    padding: 13px 13px 22px;
+  }
+
+  .twilight-nav-actions button:first-child {
+    border: 0;
+    padding-right: 2px;
+    background: transparent;
+  }
+
+  .twilight-nav-actions button:first-child {
+    font-size: 0;
+  }
+
+  .twilight-nav-actions button:first-child::before {
+    content: "✦";
+    font-size: 12px;
+  }
+
+  .twilight-nav-actions button:first-child strong {
+    font-size: 10px;
+  }
+
+  .twilight-layout {
+    display: block;
+    padding: 24px 0 0;
+  }
+
+  .twilight-copy {
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  .twilight-copy h1 {
+    font-size: 40px;
+  }
+
+  .twilight-intro {
+    display: none;
+  }
+
+  .twilight-stats {
+    display: none;
+  }
+
+  .twilight-hud {
+    margin-bottom: 8px;
+  }
+
+  .twilight-frame {
+    border-radius: 20px;
+  }
+
+  .twilight-mobile-controls {
+    display: grid;
+  }
+
+  .twilight-mobile-features {
+    display: grid;
+  }
+
+  .twilight-collection {
+    padding: 29px 18px 22px;
+  }
+
+  .collection-grid {
+    grid-template-columns: 1fr;
   }
 }

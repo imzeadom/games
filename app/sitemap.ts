@@ -7,6 +7,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/sudoku", priority: 0.9, changeFrequency: "monthly" as const },
     { path: "/1024", priority: 0.9, changeFrequency: "monthly" as const },
     { path: "/sky-hop", priority: 0.9, changeFrequency: "monthly" as const },
+    {
+      path: "/twilight-canopy",
+      priority: 0.9,
+      changeFrequency: "monthly" as const,
+    },
     { path: "/privacy", priority: 0.3, changeFrequency: "yearly" as const },
   ];
 

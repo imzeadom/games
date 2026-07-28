@@ -11,9 +11,9 @@ export async function generateMetadata(): Promise<Metadata> {
     requestHeaders.get("x-forwarded-proto") ??
     (host.startsWith("localhost") ? "http" : "https");
   const siteUrl = `${protocol}://${host}`;
-  const title = "纸上游戏厅｜三款轻松小游戏";
+  const title = "纸上游戏厅｜四款轻松小游戏";
   const description =
-    "数独、合成 1024 与原创飞行小游戏，支持离线游玩并可安装到手机主屏幕。";
+    "数独、合成 1024 与原创休闲小游戏，支持离线游玩并可安装到手机主屏幕。";
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -27,6 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "数独",
       "1024 游戏",
       "休闲游戏",
+      "平台跳跃游戏",
       "离线游戏",
     ],
     authors: [{ name: SITE_NAME }],

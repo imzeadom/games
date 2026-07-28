@@ -17,6 +17,10 @@ const MANIFESTS = {
     href: "/manifest-sky-hop.webmanifest",
     label: "安装云雀跃",
   },
+  "/twilight-canopy": {
+    href: "/manifest-twilight.webmanifest",
+    label: "安装暮色拾星",
+  },
   "/sudoku": {
     href: "/manifest-sudoku.webmanifest",
     label: "安装数独",

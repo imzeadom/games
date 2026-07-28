@@ -55,6 +55,27 @@ const games = [
       </div>
     ),
   },
+  {
+    href: "/twilight-canopy",
+    number: "04",
+    title: "暮色拾星",
+    description: "踏亮林冠间的灯笼，滑翔追回每一次差一点的落点。",
+    action: "去林冠拾星",
+    className: "twilight-card",
+    preview: (
+      <div className="mini-twilight" aria-hidden="true">
+        <span className="mini-moon">✦</span>
+        <span className="mini-leaf leaf-a" />
+        <span className="mini-leaf leaf-b" />
+        <span className="mini-lantern" />
+        <span className="mini-squirrel">
+          <i />
+          <b />
+        </span>
+        <span className="mini-butterfly">◆</span>
+      </div>
+    ),
+  },
 ];
 
 export default function GamesHome() {
@@ -87,7 +108,7 @@ export default function GamesHome() {
         operatingSystem: "Any",
         url: SITE_URL,
         description:
-          "数独、合成 1024 与原创飞行小游戏组成的中文 PWA 游戏合集。",
+          "数独、合成 1024 与原创休闲小游戏组成的中文 PWA 游戏合集。",
         offers: {
           "@type": "Offer",
           price: 0,
@@ -115,7 +136,7 @@ export default function GamesHome() {
             <small>PAPER ARCADE</small>
           </span>
         </Link>
-        <span className="hub-count">三款小游戏 · 随时开局</span>
+        <span className="hub-count">四款小游戏 · 随时开局</span>
       </header>
 
       <section className="hub-hero">
@@ -128,7 +149,7 @@ export default function GamesHome() {
           </h1>
         </div>
         <p>
-          三款轻量小游戏，不用注册进度也会留在当前设备。支持离线游玩，
+          四款轻量小游戏，不用注册进度也会留在当前设备。支持离线游玩，
           也可以分别安装到手机主屏幕。
         </p>
       </section>

@@ -9,6 +9,7 @@ Canonical URL: https://games.imzeadom.chatgpt.site/
 - [纸上数独](https://games.imzeadom.chatgpt.site/sudoku): 简单、中等、困难三档数独，支持草稿、删除草稿、相同数字与行列高亮。
 - [合成 1024](https://games.imzeadom.chatgpt.site/1024): 使用方向键或触屏滑动方块，合并相同数字并挑战 1024。
 - [云雀跃](https://games.imzeadom.chatgpt.site/sky-hop): 使用原创云雀角色与天空素材的点击飞行躲避游戏。
+- [暮色拾星](https://games.imzeadom.chatgpt.site/twilight-canopy): 操控飞鼠在暮色林冠间自动弹跳，支持滑翔、气流救援、灵蝶翻倍计分与星尘解锁。
 
 ## Site facts
 
