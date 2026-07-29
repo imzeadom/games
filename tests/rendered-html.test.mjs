@@ -187,8 +187,12 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     dice,
     history,
   ]) {
-    assert.match(page, /<PwaRefreshButton \/>/);
+    assert.match(page, /<PwaMenuActions \/>/);
   }
+  assert.doesNotMatch(styles, /\.install-pwa-button/);
+  assert.doesNotMatch(pwaRegister, /className="install-pwa-button"/);
+  assert.match(pwaRegister, /className="menu-pwa-button menu-install-button"/);
+  assert.match(pwaRegister, /installContext\.installLabel/);
   assert.match(maze, /generateMaze/);
   assert.match(maze, /analysis\.reachable !== cells\.length/);
   assert.match(maze, /branchDepth/);

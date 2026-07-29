@@ -45,34 +45,6 @@ button {
   font: inherit;
 }
 
-.install-pwa-button {
-  position: fixed;
-  z-index: 30;
-  right: max(18px, env(safe-area-inset-right));
-  bottom: max(18px, env(safe-area-inset-bottom));
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  border: 1px solid var(--ink);
-  border-radius: 999px;
-  padding: 11px 18px;
-  background: var(--ink);
-  box-shadow: 0 12px 30px rgb(23 35 31 / 22%);
-  color: white;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.install-pwa-button:hover {
-  background: #2c4038;
-  transform: translateY(-1px);
-}
-
-.install-pwa-button span {
-  font-size: 17px;
-  line-height: 1;
-}
-
 @keyframes refresh-spin {
   to {
     transform: rotate(360deg);
@@ -725,11 +697,11 @@ footer {
     font-size: 11px;
   }
 
-  .menu-refresh-button {
+  .menu-pwa-button {
     padding: 6px 8px;
   }
 
-  .menu-refresh-label {
+  .menu-action-label {
     display: none;
   }
 
@@ -1210,7 +1182,7 @@ footer {
   gap: 12px;
 }
 
-.menu-refresh-button {
+.menu-pwa-button {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -1226,17 +1198,17 @@ footer {
   white-space: nowrap;
 }
 
-.menu-refresh-button:hover:not(:disabled) {
+.menu-pwa-button:hover:not(:disabled) {
   border-color: var(--ink);
   color: var(--ink);
 }
 
-.menu-refresh-button:disabled {
+.menu-pwa-button:disabled {
   cursor: wait;
   opacity: 0.72;
 }
 
-.menu-refresh-button:disabled span {
+.menu-refresh-button:disabled > span:first-child {
   animation: refresh-spin 800ms linear infinite;
 }
 
@@ -1904,7 +1876,7 @@ footer {
   letter-spacing: 0.06em;
 }
 
-.twilight-nav-actions .menu-refresh-button {
+.twilight-nav-actions .menu-pwa-button {
   color: var(--twilight-muted);
 }
 

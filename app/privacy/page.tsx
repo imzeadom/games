@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PrivacyActions } from "./privacy-actions";
 import { SITE_URL } from "../site";
-import { PwaRefreshButton } from "../pwa-register";
+import { PwaMenuActions } from "../pwa-register";
 
 export const metadata: Metadata = {
   title: "隐私说明｜纸上游戏厅",
@@ -19,7 +19,7 @@ export default function PrivacyPage() {
         </Link>
         <div className="nav-actions">
           <span>隐私与本地数据</span>
-          <PwaRefreshButton />
+          <PwaMenuActions />
         </div>
       </header>
 

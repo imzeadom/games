@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PwaRefreshButton } from "./pwa-register";
+import { PwaMenuActions } from "./pwa-register";
 import { SITE_NAME, SITE_URL } from "./site";
 
 const games = [
@@ -183,7 +183,7 @@ export default function GamesHome() {
         </Link>
         <div className="hub-actions">
           <Link href="/history">历史成绩</Link>
-          <PwaRefreshButton />
+          <PwaMenuActions />
           <span className="hub-count">六款小游戏 · 随时开局</span>
         </div>
       </header>

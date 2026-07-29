@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { formatDuration, recordScore } from "../lib/score-history";
-import { PwaRefreshButton } from "../pwa-register";
+import { PwaMenuActions } from "../pwa-register";
 
 type Difficulty = "easy" | "medium" | "hard";
 type Direction = "up" | "right" | "down" | "left";
@@ -389,7 +389,7 @@ export default function MazeGame() {
           <Link href="/history" className="back-link">
             历史成绩
           </Link>
-          <PwaRefreshButton />
+          <PwaMenuActions />
         </div>
       </header>
 

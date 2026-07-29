@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { recordScore } from "../lib/score-history";
-import { PwaRefreshButton } from "../pwa-register";
+import { PwaMenuActions } from "../pwa-register";
 
 type Difficulty = "easy" | "medium" | "hard";
 type Notes = Record<number, number[]>;
@@ -419,7 +419,7 @@ export default function Home() {
           </span>
         </Link>
         <div className="header-actions">
-          <PwaRefreshButton />
+          <PwaMenuActions />
           <button className="rules-button" onClick={() => setShowRules(true)}>
             <span aria-hidden="true">?</span>
             游戏说明

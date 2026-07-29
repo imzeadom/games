@@ -1,7 +1,13 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -37,6 +43,14 @@ const REFRESH_LABELS: Record<RefreshState, string> = {
 
 const SERVICE_WORKER_ENABLED = process.env.NODE_ENV === "production";
 
+type InstallContextValue = {
+  installPrompt: InstallPromptEvent | null;
+  installLabel: string;
+  install: () => Promise<void>;
+};
+
+const InstallContext = createContext<InstallContextValue | null>(null);
+
 function waitForActivation(worker: ServiceWorker) {
   if (worker.state === "activated" || worker.state === "redundant") {
     return Promise.resolve();
@@ -61,7 +75,7 @@ function waitForActivation(worker: ServiceWorker) {
   });
 }
 
-export function PwaRegister() {
+export function PwaRegister({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [installPrompt, setInstallPrompt] =
     useState<InstallPromptEvent | null>(null);
@@ -114,27 +128,24 @@ export function PwaRegister() {
   };
 
   return (
-    <>
+    <InstallContext.Provider
+      value={{
+        installPrompt,
+        installLabel: manifest.label,
+        install,
+      }}
+    >
+      {children}
       <link
         rel="manifest"
         href={manifest.href}
         crossOrigin="use-credentials"
       />
-      {installPrompt && (
-        <button
-          className="install-pwa-button"
-          type="button"
-          onClick={install}
-        >
-          <span aria-hidden="true">↓</span>
-          {manifest.label}
-        </button>
-      )}
-    </>
+    </InstallContext.Provider>
   );
 }
 
-export function PwaRefreshButton() {
+function PwaRefreshButton() {
   const [refreshState, setRefreshState] = useState<RefreshState>("idle");
 
   const forceRefresh = async () => {
@@ -179,7 +190,7 @@ export function PwaRefreshButton() {
 
   return (
     <button
-      className="menu-refresh-button"
+      className="menu-pwa-button menu-refresh-button"
       type="button"
       onClick={forceRefresh}
       disabled={refreshState !== "idle"}
@@ -187,9 +198,32 @@ export function PwaRefreshButton() {
       aria-busy={refreshState !== "idle"}
     >
       <span aria-hidden="true">↻</span>
-      <span className="menu-refresh-label">
+      <span className="menu-action-label">
         {REFRESH_LABELS[refreshState]}
       </span>
     </button>
+  );
+}
+
+export function PwaMenuActions() {
+  const installContext = useContext(InstallContext);
+
+  return (
+    <>
+      <PwaRefreshButton />
+      {installContext?.installPrompt && (
+        <button
+          className="menu-pwa-button menu-install-button"
+          type="button"
+          onClick={installContext.install}
+          aria-label={installContext.installLabel}
+        >
+          <span aria-hidden="true">↓</span>
+          <span className="menu-action-label">
+            {installContext.installLabel}
+          </span>
+        </button>
+      )}
+    </>
   );
 }

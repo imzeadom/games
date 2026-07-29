@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { recordScore } from "../lib/score-history";
-import { PwaRefreshButton } from "../pwa-register";
+import { PwaMenuActions } from "../pwa-register";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type GamePhase = "ready" | "playing" | "over";
@@ -275,7 +275,7 @@ export default function SkyHop() {
         </Link>
         <div className="nav-actions">
           <span>原创角色 · 原创美术</span>
-          <PwaRefreshButton />
+          <PwaMenuActions />
         </div>
       </header>
 

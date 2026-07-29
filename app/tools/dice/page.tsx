@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { PwaRefreshButton } from "../../pwa-register";
+import { PwaMenuActions } from "../../pwa-register";
 
 type DiceRoll = {
   id: string;
@@ -115,7 +115,7 @@ export default function DiceTool() {
         </Link>
         <div className="nav-actions">
           <span>游戏工具 · 不计入成绩</span>
-          <PwaRefreshButton />
+          <PwaMenuActions />
         </div>
       </header>
 

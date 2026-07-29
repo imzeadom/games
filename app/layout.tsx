@@ -94,8 +94,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body>
-        {children}
-        <PwaRegister />
+        <PwaRegister>{children}</PwaRegister>
       </body>
     </html>
   );
