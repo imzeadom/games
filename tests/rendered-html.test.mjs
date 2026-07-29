@@ -193,6 +193,9 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.doesNotMatch(pwaRegister, /className="install-pwa-button"/);
   assert.match(pwaRegister, /className="menu-pwa-button menu-install-button"/);
   assert.match(pwaRegister, /installContext\.installLabel/);
+  assert.match(pwaRegister, /display-mode: standalone/);
+  assert.match(pwaRegister, /installationHelpFor/);
+  assert.match(pwaRegister, /添加到主屏幕/);
   assert.match(maze, /generateMaze/);
   assert.match(maze, /analysis\.reachable !== cells\.length/);
   assert.match(maze, /branchDepth/);

@@ -531,7 +531,8 @@ footer {
 }
 
 .rules-modal,
-.win-modal {
+.win-modal,
+.install-help-modal {
   position: relative;
   width: min(460px, 100%);
   border: 1px solid rgb(23 35 31 / 18%);
@@ -541,11 +542,44 @@ footer {
 }
 
 .rules-modal h2,
-.win-modal h2 {
+.win-modal h2,
+.install-help-modal h2 {
   margin: 0 0 22px;
   font-family: "STSong", "SimSun", serif;
   font-size: 32px;
   font-weight: 500;
+}
+
+.install-help-modal {
+  color: var(--ink);
+  letter-spacing: normal;
+}
+
+.install-help-modal .eyebrow {
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.install-help-modal h2 {
+  text-align: center;
+}
+
+.install-help-modal > p:not(.eyebrow) {
+  margin: -8px 0 26px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.85;
+}
+
+.install-help-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 20px;
+  place-items: center;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  font-size: 24px;
 }
 
 .modal-close {
@@ -785,7 +819,8 @@ footer {
   }
 
   .rules-modal,
-  .win-modal {
+  .win-modal,
+  .install-help-modal {
     padding: 32px 24px 24px;
   }
 }

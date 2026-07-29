@@ -46,10 +46,27 @@ const SERVICE_WORKER_ENABLED = process.env.NODE_ENV === "production";
 type InstallContextValue = {
   installPrompt: InstallPromptEvent | null;
   installLabel: string;
-  install: () => Promise<void>;
+  isInstalled: boolean;
+  install: () => Promise<boolean>;
 };
 
 const InstallContext = createContext<InstallContextValue | null>(null);
+
+function installationHelpFor(userAgent: string) {
+  if (/iphone|ipad|ipod/i.test(userAgent)) {
+    return "点按浏览器的“分享”按钮，再选择“添加到主屏幕”。";
+  }
+
+  if (/android/i.test(userAgent)) {
+    return "打开浏览器右上角菜单，选择“安装应用”或“添加到主屏幕”。";
+  }
+
+  if (/safari/i.test(userAgent) && !/chrome|chromium|edg/i.test(userAgent)) {
+    return "打开 Safari 的“文件”菜单，选择“添加到程序坞”。";
+  }
+
+  return "查看地址栏右侧的安装图标；如果没有，请打开浏览器菜单，选择“安装应用”。";
+}
 
 function waitForActivation(worker: ServiceWorker) {
   if (worker.state === "activated" || worker.state === "redundant") {
@@ -79,6 +96,7 @@ export function PwaRegister({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [installPrompt, setInstallPrompt] =
     useState<InstallPromptEvent | null>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
   const manifest =
     MANIFESTS[pathname as keyof typeof MANIFESTS] ?? {
       href: "/manifest.webmanifest",
@@ -108,23 +126,40 @@ export function PwaRegister({ children }: { children: ReactNode }) {
     const onInstallAvailable = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as InstallPromptEvent);
+      setIsInstalled(false);
     };
-    const onInstalled = () => setInstallPrompt(null);
+    const onInstalled = () => {
+      setInstallPrompt(null);
+      setIsInstalled(true);
+    };
+    const standaloneQuery = window.matchMedia("(display-mode: standalone)");
+    const updateInstalledState = () => {
+      const iosNavigator = navigator as Navigator & { standalone?: boolean };
+      setIsInstalled(
+        standaloneQuery.matches ||
+          iosNavigator.standalone === true ||
+          document.referrer.startsWith("android-app://"),
+      );
+    };
 
     window.addEventListener("beforeinstallprompt", onInstallAvailable);
     window.addEventListener("appinstalled", onInstalled);
+    standaloneQuery.addEventListener("change", updateInstalledState);
+    updateInstalledState();
 
     return () => {
       window.removeEventListener("beforeinstallprompt", onInstallAvailable);
       window.removeEventListener("appinstalled", onInstalled);
+      standaloneQuery.removeEventListener("change", updateInstalledState);
     };
   }, []);
 
   const install = async () => {
-    if (!installPrompt) return;
+    if (!installPrompt) return false;
     await installPrompt.prompt();
     await installPrompt.userChoice;
     setInstallPrompt(null);
+    return true;
   };
 
   return (
@@ -132,6 +167,7 @@ export function PwaRegister({ children }: { children: ReactNode }) {
       value={{
         installPrompt,
         installLabel: manifest.label,
+        isInstalled,
         install,
       }}
     >
@@ -207,15 +243,33 @@ function PwaRefreshButton() {
 
 export function PwaMenuActions() {
   const installContext = useContext(InstallContext);
+  const [showInstallHelp, setShowInstallHelp] = useState(false);
+
+  useEffect(() => {
+    if (!showInstallHelp) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowInstallHelp(false);
+    };
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [showInstallHelp]);
+
+  const requestInstall = async () => {
+    if (!installContext) return;
+    const showedNativePrompt = await installContext.install();
+    if (!showedNativePrompt) setShowInstallHelp(true);
+  };
 
   return (
     <>
       <PwaRefreshButton />
-      {installContext?.installPrompt && (
+      {installContext && !installContext.isInstalled && (
         <button
           className="menu-pwa-button menu-install-button"
           type="button"
-          onClick={installContext.install}
+          onClick={requestInstall}
           aria-label={installContext.installLabel}
         >
           <span aria-hidden="true">↓</span>
@@ -223,6 +277,47 @@ export function PwaMenuActions() {
             {installContext.installLabel}
           </span>
         </button>
+      )}
+      {showInstallHelp && installContext && (
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onClick={() => setShowInstallHelp(false)}
+        >
+          <section
+            className="install-help-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="install-help-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="modal-close"
+              type="button"
+              aria-label="关闭安装说明"
+              onClick={() => setShowInstallHelp(false)}
+            >
+              ×
+            </button>
+            <div className="install-help-icon" aria-hidden="true">
+              ↓
+            </div>
+            <p className="eyebrow">安装到设备</p>
+            <h2 id="install-help-title">{installContext.installLabel}</h2>
+            <p>
+              {installationHelpFor(navigator.userAgent)}
+              安装后可以从主屏幕或应用列表直接打开，并继续使用离线游戏。
+            </p>
+            <button
+              className="primary-button"
+              type="button"
+              autoFocus
+              onClick={() => setShowInstallHelp(false)}
+            >
+              知道了
+            </button>
+          </section>
+        </div>
       )}
     </>
   );
