@@ -61,6 +61,7 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
       html,
       /rel="manifest"[^>]+crossorigin="use-credentials"|crossorigin="use-credentials"[^>]+rel="manifest"/,
     );
+    assert.match(html, /强制刷新/);
     assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
   }
 });
@@ -82,6 +83,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     dice,
     history,
     vocabulary,
+    pwaRegister,
   ] =
     await Promise.all([
       readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
@@ -105,6 +107,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
         new URL("../app/crossword/vocabulary.ts", import.meta.url),
         "utf8",
       ),
+      readFile(new URL("../app/pwa-register.tsx", import.meta.url), "utf8"),
     ]);
 
   assert.match(hub, /纸上数独/);
@@ -160,9 +163,19 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(site, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.match(llms, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.doesNotMatch(llms, /paper-sudoku-games/);
-  assert.match(serviceWorker, /paper-arcade-v5/);
+  assert.match(serviceWorker, /paper-arcade-v6/);
   assert.match(serviceWorker, /twilight-canopy/);
   assert.match(serviceWorker, /crossword/);
+  assert.match(serviceWorker, /SKIP_WAITING/);
+  assert.match(serviceWorker, /cache: "no-store"/);
+  assert.match(pwaRegister, /强制刷新/);
+  assert.match(pwaRegister, /registration\.update\(\)/);
+  assert.match(pwaRegister, /updateViaCache: "none"/);
+  assert.match(
+    pwaRegister,
+    /SERVICE_WORKER_ENABLED = process\.env\.NODE_ENV === "production"/,
+  );
+  assert.match(pwaRegister, /registration\.unregister\(\)/);
   assert.match(maze, /generateMaze/);
   assert.match(maze, /analysis\.reachable !== cells\.length/);
   assert.match(maze, /branchDepth/);

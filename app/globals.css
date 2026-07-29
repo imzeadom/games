@@ -45,32 +45,73 @@ button {
   font: inherit;
 }
 
-.install-pwa-button {
+.pwa-actions {
   position: fixed;
   z-index: 30;
   right: max(18px, env(safe-area-inset-right));
   bottom: max(18px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.pwa-action-button {
   display: inline-flex;
   align-items: center;
   gap: 9px;
   border: 1px solid var(--ink);
   border-radius: 999px;
   padding: 11px 18px;
-  background: var(--ink);
   box-shadow: 0 12px 30px rgb(23 35 31 / 22%);
-  color: white;
   cursor: pointer;
   font-size: 12px;
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.pwa-action-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.pwa-action-button:disabled {
+  cursor: wait;
+  opacity: 0.78;
+}
+
+.pwa-action-button span {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.install-pwa-button {
+  background: var(--ink);
+  color: white;
 }
 
 .install-pwa-button:hover {
   background: #2c4038;
-  transform: translateY(-1px);
 }
 
-.install-pwa-button span {
-  font-size: 17px;
-  line-height: 1;
+.refresh-pwa-button {
+  background: rgb(255 253 248 / 94%);
+  color: var(--ink);
+  backdrop-filter: blur(8px);
+}
+
+.refresh-pwa-button:hover:not(:disabled) {
+  background: var(--sage-light);
+}
+
+.refresh-pwa-button:disabled span {
+  animation: refresh-spin 800ms linear infinite;
+}
+
+@keyframes refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 button:focus-visible,

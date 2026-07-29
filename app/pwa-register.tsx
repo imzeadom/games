@@ -27,10 +27,45 @@ const MANIFESTS = {
   },
 };
 
+type RefreshState = "idle" | "checking" | "updating";
+
+const REFRESH_LABELS: Record<RefreshState, string> = {
+  idle: "强制刷新",
+  checking: "检查更新…",
+  updating: "载入新版…",
+};
+
+const SERVICE_WORKER_ENABLED = process.env.NODE_ENV === "production";
+
+function waitForActivation(worker: ServiceWorker) {
+  if (worker.state === "activated" || worker.state === "redundant") {
+    return Promise.resolve();
+  }
+
+  return new Promise<void>((resolve) => {
+    const timeout = window.setTimeout(finish, 8_000);
+
+    function finish() {
+      window.clearTimeout(timeout);
+      worker.removeEventListener("statechange", onStateChange);
+      resolve();
+    }
+
+    function onStateChange() {
+      if (worker.state === "activated" || worker.state === "redundant") {
+        finish();
+      }
+    }
+
+    worker.addEventListener("statechange", onStateChange);
+  });
+}
+
 export function PwaRegister() {
   const pathname = usePathname();
   const [installPrompt, setInstallPrompt] =
     useState<InstallPromptEvent | null>(null);
+  const [refreshState, setRefreshState] = useState<RefreshState>("idle");
   const manifest =
     MANIFESTS[pathname as keyof typeof MANIFESTS] ?? {
       href: "/manifest.webmanifest",
@@ -39,9 +74,22 @@ export function PwaRegister() {
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .catch((error) => console.warn("PWA 离线功能注册失败", error));
+      if (SERVICE_WORKER_ENABLED) {
+        navigator.serviceWorker
+          .register("/sw.js", { updateViaCache: "none" })
+          .catch((error) => console.warn("PWA 离线功能注册失败", error));
+      } else {
+        navigator.serviceWorker
+          .getRegistrations()
+          .then((registrations) =>
+            Promise.all(
+              registrations.map((registration) => registration.unregister()),
+            ),
+          )
+          .catch((error) =>
+            console.warn("清理开发环境 Service Worker 失败", error),
+          );
+      }
     }
 
     const onInstallAvailable = (event: Event) => {
@@ -66,6 +114,46 @@ export function PwaRegister() {
     setInstallPrompt(null);
   };
 
+  const forceRefresh = async () => {
+    if (refreshState !== "idle") return;
+
+    setRefreshState("checking");
+
+    try {
+      if (SERVICE_WORKER_ENABLED && "serviceWorker" in navigator) {
+        const registration = await navigator.serviceWorker.register("/sw.js", {
+          updateViaCache: "none",
+        });
+        let updateWorker =
+          registration.installing ?? registration.waiting ?? null;
+
+        const rememberUpdate = () => {
+          updateWorker = registration.installing ?? registration.waiting;
+        };
+
+        registration.addEventListener("updatefound", rememberUpdate);
+        try {
+          await registration.update();
+        } finally {
+          registration.removeEventListener("updatefound", rememberUpdate);
+        }
+
+        updateWorker =
+          registration.installing ?? registration.waiting ?? updateWorker;
+
+        if (updateWorker && updateWorker !== registration.active) {
+          setRefreshState("updating");
+          updateWorker.postMessage({ type: "SKIP_WAITING" });
+          await waitForActivation(updateWorker);
+        }
+      }
+    } catch (error) {
+      console.warn("检查 PWA 更新失败，将直接刷新页面", error);
+    }
+
+    window.location.reload();
+  };
+
   return (
     <>
       <link
@@ -73,12 +161,29 @@ export function PwaRegister() {
         href={manifest.href}
         crossOrigin="use-credentials"
       />
-      {installPrompt && (
-        <button className="install-pwa-button" onClick={install}>
-          <span aria-hidden="true">↓</span>
-          {manifest.label}
+      <div className="pwa-actions" aria-live="polite">
+        <button
+          className="pwa-action-button refresh-pwa-button"
+          type="button"
+          onClick={forceRefresh}
+          disabled={refreshState !== "idle"}
+          aria-label="检查服务端更新并强制刷新"
+          aria-busy={refreshState !== "idle"}
+        >
+          <span aria-hidden="true">↻</span>
+          {REFRESH_LABELS[refreshState]}
         </button>
-      )}
+        {installPrompt && (
+          <button
+            className="pwa-action-button install-pwa-button"
+            type="button"
+            onClick={install}
+          >
+            <span aria-hidden="true">↓</span>
+            {manifest.label}
+          </button>
+        )}
+      </div>
     </>
   );
 }

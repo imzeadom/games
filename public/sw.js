@@ -1,4 +1,4 @@
-const CACHE_NAME = "paper-arcade-v5";
+const CACHE_NAME = "paper-arcade-v6";
 const APP_SHELL = [
   "/",
   "/sudoku",
@@ -49,11 +49,22 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
+  const networkRequest =
+    event.request.mode === "navigate"
+      ? new Request(event.request, { cache: "no-store" })
+      : event.request;
+
   event.respondWith(
-    fetch(event.request)
+    fetch(networkRequest)
       .then((response) => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
