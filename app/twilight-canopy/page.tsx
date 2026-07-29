@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { recordScore } from "../lib/score-history";
+import { PwaRefreshButton } from "../pwa-register";
 import {
   useCallback,
   useEffect,
@@ -1781,6 +1782,7 @@ export default function TwilightCanopy() {
           >
             {phase === "paused" ? "继续" : "暂停"}
           </button>
+          <PwaRefreshButton />
         </div>
       </header>
 

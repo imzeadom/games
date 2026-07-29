@@ -61,7 +61,6 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
       html,
       /rel="manifest"[^>]+crossorigin="use-credentials"|crossorigin="use-credentials"[^>]+rel="manifest"/,
     );
-    assert.match(html, /强制刷新/);
     assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
   }
 });
@@ -176,6 +175,20 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     /SERVICE_WORKER_ENABLED = process\.env\.NODE_ENV === "production"/,
   );
   assert.match(pwaRegister, /registration\.unregister\(\)/);
+  for (const page of [
+    hub,
+    sudoku,
+    merge,
+    skyHop,
+    twilight,
+    privacy,
+    maze,
+    crossword,
+    dice,
+    history,
+  ]) {
+    assert.match(page, /<PwaRefreshButton \/>/);
+  }
   assert.match(maze, /generateMaze/);
   assert.match(maze, /analysis\.reachable !== cells\.length/);
   assert.match(maze, /branchDepth/);

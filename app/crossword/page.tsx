@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { formatDuration, recordScore } from "../lib/score-history";
+import { PwaRefreshButton } from "../pwa-register";
 import { VOCABULARY, type VocabularyWord } from "./vocabulary";
 
 type Difficulty = "easy" | "medium" | "hard";
@@ -320,9 +321,12 @@ export default function CrosswordGame() {
         <Link href="/" className="back-link">
           ← 游戏厅
         </Link>
-        <Link href="/history" className="back-link">
-          历史成绩
-        </Link>
+        <div className="nav-actions">
+          <Link href="/history" className="back-link">
+            历史成绩
+          </Link>
+          <PwaRefreshButton />
+        </div>
       </header>
 
       <section className="crossword-heading">

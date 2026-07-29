@@ -9,6 +9,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { recordScore } from "../lib/score-history";
+import { PwaRefreshButton } from "../pwa-register";
 
 type Direction = "left" | "right" | "up" | "down";
 type MergeState = {
@@ -314,7 +315,10 @@ export default function Merge1024() {
         <Link href="/" className="back-link">
           ← 游戏厅
         </Link>
-        <span>合成 · 观察 · 再合成</span>
+        <div className="nav-actions">
+          <span>合成 · 观察 · 再合成</span>
+          <PwaRefreshButton />
+        </div>
       </header>
 
       <section className="merge-layout">

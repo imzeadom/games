@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { PwaRefreshButton } from "../pwa-register";
 import {
   clearScoreHistory,
   formatDuration,
@@ -72,7 +73,10 @@ export default function ScoreHistory() {
         <Link href="/" className="back-link">
           ← 游戏厅
         </Link>
-        <span>成绩只保存在当前设备</span>
+        <div className="nav-actions">
+          <span>成绩只保存在当前设备</span>
+          <PwaRefreshButton />
+        </div>
       </header>
 
       <section className="history-hero">

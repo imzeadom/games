@@ -45,67 +45,32 @@ button {
   font: inherit;
 }
 
-.pwa-actions {
+.install-pwa-button {
   position: fixed;
   z-index: 30;
   right: max(18px, env(safe-area-inset-right));
   bottom: max(18px, env(safe-area-inset-bottom));
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.pwa-action-button {
   display: inline-flex;
   align-items: center;
   gap: 9px;
   border: 1px solid var(--ink);
   border-radius: 999px;
   padding: 11px 18px;
+  background: var(--ink);
   box-shadow: 0 12px 30px rgb(23 35 31 / 22%);
+  color: white;
   cursor: pointer;
   font-size: 12px;
-  transition:
-    background-color 150ms ease,
-    transform 150ms ease;
-}
-
-.pwa-action-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-.pwa-action-button:disabled {
-  cursor: wait;
-  opacity: 0.78;
-}
-
-.pwa-action-button span {
-  font-size: 17px;
-  line-height: 1;
-}
-
-.install-pwa-button {
-  background: var(--ink);
-  color: white;
 }
 
 .install-pwa-button:hover {
   background: #2c4038;
+  transform: translateY(-1px);
 }
 
-.refresh-pwa-button {
-  background: rgb(255 253 248 / 94%);
-  color: var(--ink);
-  backdrop-filter: blur(8px);
-}
-
-.refresh-pwa-button:hover:not(:disabled) {
-  background: var(--sage-light);
-}
-
-.refresh-pwa-button:disabled span {
-  animation: refresh-spin 800ms linear infinite;
+.install-pwa-button span {
+  font-size: 17px;
+  line-height: 1;
 }
 
 @keyframes refresh-spin {
@@ -760,6 +725,14 @@ footer {
     font-size: 11px;
   }
 
+  .menu-refresh-button {
+    padding: 6px 8px;
+  }
+
+  .menu-refresh-label {
+    display: none;
+  }
+
   .game-layout {
     min-height: 0;
     gap: 14px;
@@ -1228,6 +1201,43 @@ footer {
   color: var(--muted);
   font-size: 10px;
   letter-spacing: 0.12em;
+}
+
+.nav-actions,
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-refresh-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgb(23 35 31 / 22%);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.menu-refresh-button:hover:not(:disabled) {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.menu-refresh-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.menu-refresh-button:disabled span {
+  animation: refresh-spin 800ms linear infinite;
 }
 
 .back-link {
@@ -1892,6 +1902,10 @@ footer {
   cursor: pointer;
   font-size: 10px;
   letter-spacing: 0.06em;
+}
+
+.twilight-nav-actions .menu-refresh-button {
+  color: var(--twilight-muted);
 }
 
 .twilight-nav-actions button:hover:not(:disabled) {
@@ -3917,7 +3931,7 @@ footer {
   }
 
   .hub-actions {
-    gap: 0;
+    gap: 8px;
   }
 
   .hub-actions a {

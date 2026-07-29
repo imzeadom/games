@@ -65,7 +65,6 @@ export function PwaRegister() {
   const pathname = usePathname();
   const [installPrompt, setInstallPrompt] =
     useState<InstallPromptEvent | null>(null);
-  const [refreshState, setRefreshState] = useState<RefreshState>("idle");
   const manifest =
     MANIFESTS[pathname as keyof typeof MANIFESTS] ?? {
       href: "/manifest.webmanifest",
@@ -114,6 +113,30 @@ export function PwaRegister() {
     setInstallPrompt(null);
   };
 
+  return (
+    <>
+      <link
+        rel="manifest"
+        href={manifest.href}
+        crossOrigin="use-credentials"
+      />
+      {installPrompt && (
+        <button
+          className="install-pwa-button"
+          type="button"
+          onClick={install}
+        >
+          <span aria-hidden="true">↓</span>
+          {manifest.label}
+        </button>
+      )}
+    </>
+  );
+}
+
+export function PwaRefreshButton() {
+  const [refreshState, setRefreshState] = useState<RefreshState>("idle");
+
   const forceRefresh = async () => {
     if (refreshState !== "idle") return;
 
@@ -155,35 +178,18 @@ export function PwaRegister() {
   };
 
   return (
-    <>
-      <link
-        rel="manifest"
-        href={manifest.href}
-        crossOrigin="use-credentials"
-      />
-      <div className="pwa-actions" aria-live="polite">
-        <button
-          className="pwa-action-button refresh-pwa-button"
-          type="button"
-          onClick={forceRefresh}
-          disabled={refreshState !== "idle"}
-          aria-label="检查服务端更新并强制刷新"
-          aria-busy={refreshState !== "idle"}
-        >
-          <span aria-hidden="true">↻</span>
-          {REFRESH_LABELS[refreshState]}
-        </button>
-        {installPrompt && (
-          <button
-            className="pwa-action-button install-pwa-button"
-            type="button"
-            onClick={install}
-          >
-            <span aria-hidden="true">↓</span>
-            {manifest.label}
-          </button>
-        )}
-      </div>
-    </>
+    <button
+      className="menu-refresh-button"
+      type="button"
+      onClick={forceRefresh}
+      disabled={refreshState !== "idle"}
+      aria-label="检查服务端更新并强制刷新"
+      aria-busy={refreshState !== "idle"}
+    >
+      <span aria-hidden="true">↻</span>
+      <span className="menu-refresh-label">
+        {REFRESH_LABELS[refreshState]}
+      </span>
+    </button>
   );
 }
