@@ -30,7 +30,7 @@ async function render(pathname = "/") {
 
 test("server-renders the game hub and route-specific PWA metadata", async () => {
   const routes = [
-    ["/", "纸上游戏厅｜四款轻松小游戏", "manifest.webmanifest"],
+    ["/", "纸上游戏厅｜六款轻松小游戏与实用工具", "manifest.webmanifest"],
     ["/sudoku", "纸上数独｜纸上游戏厅", "manifest-sudoku.webmanifest"],
     ["/1024", "合成 1024｜纸上游戏厅", "manifest-1024.webmanifest"],
     ["/sky-hop", "云雀跃｜纸上游戏厅", "manifest-sky-hop.webmanifest"],
@@ -39,6 +39,14 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
       "暮色拾星｜纸上游戏厅",
       "manifest-twilight.webmanifest",
     ],
+    ["/maze", "纸上迷宫｜纸上游戏厅", "manifest.webmanifest"],
+    [
+      "/crossword",
+      "Crossword 单词寻踪｜纸上游戏厅",
+      "manifest.webmanifest",
+    ],
+    ["/tools/dice", "骰子工具｜纸上游戏厅", "manifest.webmanifest"],
+    ["/history", "历史成绩｜纸上游戏厅", "manifest.webmanifest"],
     ["/privacy", "隐私说明｜纸上游戏厅", "manifest.webmanifest"],
   ];
 
@@ -69,6 +77,11 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     llms,
     styles,
     serviceWorker,
+    maze,
+    crossword,
+    dice,
+    history,
+    vocabulary,
   ] =
     await Promise.all([
       readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
@@ -84,19 +97,33 @@ test("ships animated games, original art, privacy, and discovery assets", async 
       readFile(new URL("../public/llms.txt", import.meta.url), "utf8"),
       readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
       readFile(new URL("../public/sw.js", import.meta.url), "utf8"),
+      readFile(new URL("../app/maze/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/crossword/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/tools/dice/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/history/page.tsx", import.meta.url), "utf8"),
+      readFile(
+        new URL("../app/crossword/vocabulary.ts", import.meta.url),
+        "utf8",
+      ),
     ]);
 
   assert.match(hub, /纸上数独/);
   assert.match(hub, /合成 1024/);
   assert.match(hub, /云雀跃/);
   assert.match(hub, /暮色拾星/);
+  assert.match(hub, /纸上迷宫/);
+  assert.match(hub, /Crossword · 单词寻踪/);
+  assert.match(hub, /掷骰子/);
   assert.match(sudoku, /label: "困难"/);
   assert.match(sudoku, /setNoteMode/);
+  assert.match(sudoku, /completionDismissed/);
   assert.match(merge, /TileMovement/);
   assert.match(merge, /moving-tile/);
   assert.match(merge, /mergedTargets/);
   assert.match(merge, /movementDistance/);
   assert.match(merge, /completeSwipe/);
+  assert.match(merge, /dismissResult/);
+  assert.match(merge, /aria-label="关闭本局结果"/);
   assert.match(styles, /@keyframes tile-move/);
   assert.match(styles, /@keyframes tile-merge/);
   assert.doesNotMatch(styles, /var\(--move-column\) \*/);
@@ -133,8 +160,37 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(site, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.match(llms, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.doesNotMatch(llms, /paper-sudoku-games/);
-  assert.match(serviceWorker, /paper-arcade-v4/);
+  assert.match(serviceWorker, /paper-arcade-v5/);
   assert.match(serviceWorker, /twilight-canopy/);
+  assert.match(serviceWorker, /crossword/);
+  assert.match(maze, /generateMaze/);
+  assert.match(maze, /analysis\.reachable !== cells\.length/);
+  assert.match(maze, /branchDepth/);
+  assert.match(maze, /maze-token/);
+  assert.match(maze, /is-trail/);
+  assert.doesNotMatch(maze, /留在这一局查看路径/);
+  assert.match(maze, /label: "困难"/);
+  assert.match(maze, /recordScore/);
+  assert.match(crossword, /VOCABULARY/);
+  assert.match(crossword, /从 1000 词分级词库中随机出题/);
+  assert.match(crossword, /label: "困难"/);
+  assert.match(crossword, /showWinModal/);
+  assert.match(crossword, /aria-label="关闭完成提示"/);
+  assert.match(crossword, /size: 10/);
+  assert.match(crossword, /size: 12/);
+  assert.match(vocabulary, /VOCABULARY\.length !== 1000/);
+  assert.match(vocabulary, /is used after “he”, “she”, or “it”/);
+  assert.doesNotMatch(vocabulary, /She often/);
+  assert.ok(
+    vocabulary.split("\n").filter((line) => /^\w+\|.+$/.test(line)).length >=
+      250,
+  );
+  assert.match(dice, /DICE_SIDES = \[6, 8, 10, 12, 20\]/);
+  assert.match(dice, /D6_PIPS/);
+  assert.doesNotMatch(dice, /⚀|⚁|⚂|⚃|⚄|⚅/);
+  assert.match(styles, /\.die\.is-d6 span/);
+  assert.doesNotMatch(sudoku, /留在这一局查看棋盘/);
+  assert.match(history, /getScoreHistory/);
 
   await Promise.all([
     access(new URL("../public/icon-1024-192.png", import.meta.url)),

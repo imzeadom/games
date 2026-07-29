@@ -76,6 +76,50 @@ const games = [
       </div>
     ),
   },
+  {
+    href: "/maze",
+    number: "05",
+    title: "纸上迷宫",
+    description: "在随机生成的岔路中辨认方向，找到右下角的出口。",
+    action: "走进迷宫",
+    className: "maze-card",
+    preview: (
+      <div className="mini-maze" aria-hidden="true">
+        {Array.from({ length: 36 }, (_, index) => (
+          <span
+            key={index}
+            className={
+              [0, 1, 7, 8, 14, 15, 21, 27, 28, 29, 35].includes(index)
+                ? "is-route"
+                : ""
+            }
+          />
+        ))}
+        <i />
+        <b>◎</b>
+      </div>
+    ),
+  },
+  {
+    href: "/crossword",
+    number: "06",
+    title: "Crossword · 单词寻踪",
+    description: "找出交错隐藏的英文单词，顺手记住中文意思和例句。",
+    action: "开始找词",
+    className: "crossword-card",
+    preview: (
+      <div className="mini-crossword" aria-hidden="true">
+        {"BRIDGEPLANETWORDGAME".split("").map((letter, index) => (
+          <span
+            key={index}
+            className={index >= 4 && index <= 9 ? "is-word" : ""}
+          >
+            {letter}
+          </span>
+        ))}
+      </div>
+    ),
+  },
 ];
 
 export default function GamesHome() {
@@ -108,7 +152,7 @@ export default function GamesHome() {
         operatingSystem: "Any",
         url: SITE_URL,
         description:
-          "数独、合成 1024 与原创休闲小游戏组成的中文 PWA 游戏合集。",
+          "数独、迷宫、英文单词寻踪与原创休闲小游戏组成的中文 PWA 游戏合集。",
         offers: {
           "@type": "Offer",
           price: 0,
@@ -136,7 +180,10 @@ export default function GamesHome() {
             <small>PAPER ARCADE</small>
           </span>
         </Link>
-        <span className="hub-count">四款小游戏 · 随时开局</span>
+        <div className="hub-actions">
+          <Link href="/history">历史成绩</Link>
+          <span className="hub-count">六款小游戏 · 随时开局</span>
+        </div>
       </header>
 
       <section className="hub-hero">
@@ -149,7 +196,7 @@ export default function GamesHome() {
           </h1>
         </div>
         <p>
-          四款轻量小游戏，不用注册进度也会留在当前设备。支持离线游玩，
+          六款轻量小游戏，不用注册进度也会留在当前设备。支持离线游玩，
           也可以分别安装到手机主屏幕。
         </p>
       </section>
@@ -178,10 +225,33 @@ export default function GamesHome() {
         ))}
       </section>
 
+      <section className="hub-tools" aria-labelledby="tools-title">
+        <div className="tools-heading">
+          <div>
+            <p className="eyebrow">GAME TOOLS</p>
+            <h2 id="tools-title">顺手可用的小工具</h2>
+          </div>
+          <p>不设输赢，也不计入成绩。需要的时候，随手打开。</p>
+        </div>
+        <Link className="tool-card" href="/tools/dice">
+          <div className="tool-card-icon" aria-hidden="true">
+            <i className="paper-die paper-die-back" />
+            <i className="paper-die paper-die-front" />
+          </div>
+          <div>
+            <span>01 · 骰子工具</span>
+            <h3>掷骰子</h3>
+            <p>支持 1–6 枚 D6、D8、D10、D12 与 D20。</p>
+          </div>
+          <b aria-hidden="true">↗</b>
+        </Link>
+      </section>
+
       <footer className="hub-footer">
-        <span>纸上游戏厅 · 第一辑</span>
+        <span>纸上游戏厅 · 持续更新</span>
         <span>
-          无广告 · 进度仅存于你的设备 · <Link href="/privacy">隐私说明</Link>
+          <Link href="/history">历史成绩</Link> · 无广告 ·
+          进度仅存于你的设备 · <Link href="/privacy">隐私说明</Link>
         </span>
       </footer>
     </main>

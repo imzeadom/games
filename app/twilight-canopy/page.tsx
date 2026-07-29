@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { recordScore } from "../lib/score-history";
 import {
   useCallback,
   useEffect,
@@ -1215,12 +1216,28 @@ export default function TwilightCanopy() {
   }, [chime, syncHud]);
 
   const endGame = useCallback(() => {
+    if (phaseRef.current === "over") return;
+    const world = worldRef.current;
     phaseRef.current = "over";
     setPhase("over");
     inputRef.current.glide = false;
     inputRef.current.left = false;
     inputRef.current.right = false;
     syncHud();
+    const safeScore =
+      world.score > BigInt(Number.MAX_SAFE_INTEGER)
+        ? Number.MAX_SAFE_INTEGER
+        : Number(world.score);
+    recordScore({
+      gameId: "twilight-canopy",
+      gameName: "暮色拾星",
+      score: safeScore,
+      elapsed: Math.floor(world.elapsed),
+      detail: `星分 ${formatScore(world.score)} · 高度 ${Math.floor(
+        world.maxHeight / 10,
+      )} m`,
+      completed: false,
+    });
   }, [syncHud]);
 
   const start = useCallback(() => {

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { recordScore } from "../lib/score-history";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type GamePhase = "ready" | "playing" | "over";
@@ -121,6 +122,7 @@ export default function SkyHop() {
   }, []);
 
   const endGame = useCallback(() => {
+    if (phaseRef.current === "over") return;
     phaseRef.current = "over";
     setPhase("over");
     const finalScore = worldRef.current.score;
@@ -128,6 +130,13 @@ export default function SkyHop() {
       const next = Math.max(current, finalScore);
       window.localStorage.setItem(STORAGE_KEY, String(next));
       return next;
+    });
+    recordScore({
+      gameId: "sky-hop",
+      gameName: "云雀跃",
+      score: finalScore,
+      detail: `飞过 ${finalScore} 道云门`,
+      completed: false,
     });
   }, []);
 

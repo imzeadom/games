@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import Link from "next/link";
+import { recordScore } from "../lib/score-history";
 
 type Direction = "left" | "right" | "up" | "down";
 type MergeState = {
@@ -181,6 +182,7 @@ export default function Merge1024() {
   });
   const touchStart = useRef<[number, number] | null>(null);
   const animationTimer = useRef<number | null>(null);
+  const scoreRecorded = useRef(false);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -222,8 +224,20 @@ export default function Merge1024() {
         const score = game.score + result.gained;
         const best = Math.max(game.best, score);
 
-        if (!game.keepPlaying && board.includes(1024)) setShowWin(true);
-        if (!hasMoves(board)) setShowGameOver(true);
+        const reachedGoal = !game.keepPlaying && board.includes(1024);
+        const gameOver = !hasMoves(board);
+        if (reachedGoal) setShowWin(true);
+        if (gameOver) setShowGameOver(true);
+        if ((reachedGoal || gameOver) && !scoreRecorded.current) {
+          scoreRecorded.current = true;
+          recordScore({
+            gameId: "merge-1024",
+            gameName: "合成 1024",
+            score,
+            detail: reachedGoal ? "成功合成 1024" : "棋盘已满",
+            completed: reachedGoal,
+          });
+        }
 
         setGame({ ...game, board, score, best });
         setTileEffects({
@@ -259,6 +273,7 @@ export default function Merge1024() {
     animationTimer.current = null;
     setAnimation(null);
     setTileEffects({ newIndex: null, mergedTargets: [] });
+    scoreRecorded.current = false;
     setGame((current) => newGame(current?.best ?? 0));
     setShowWin(false);
     setShowGameOver(false);
@@ -277,6 +292,16 @@ export default function Merge1024() {
     } else {
       move(deltaY > 0 ? "down" : "up");
     }
+  };
+
+  const dismissResult = () => {
+    if (showWin && game) {
+      const continuedGame = { ...game, keepPlaying: true };
+      setGame(continuedGame);
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(continuedGame));
+    }
+    setShowWin(false);
+    setShowGameOver(false);
   };
 
   if (!game) {
@@ -384,9 +409,13 @@ export default function Merge1024() {
       {(showWin || showGameOver) && (
         <div className="modal-backdrop">
           <section className="win-modal" role="dialog" aria-modal="true">
-            <div className="win-mark" aria-hidden="true">
-              {showWin ? "1024" : "×"}
-            </div>
+            <button
+              className="modal-close"
+              aria-label="关闭本局结果"
+              onClick={dismissResult}
+            >
+              ×
+            </button>
             <p className="eyebrow">{showWin ? "目标达成" : "本局结束"}</p>
             <h2>{showWin ? "合成成功！" : "棋盘没有空间了"}</h2>
             <p>

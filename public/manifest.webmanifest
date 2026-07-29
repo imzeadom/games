@@ -1,7 +1,7 @@
 {
   "name": "纸上游戏厅",
   "short_name": "游戏厅",
-  "description": "数独、合成 1024 与原创飞行小游戏。",
+  "description": "数独、迷宫、英文单词寻踪与原创休闲小游戏。",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f4f0e6",

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { recordScore } from "../lib/score-history";
 
 type Difficulty = "easy" | "medium" | "hard";
 type Notes = Record<number, number[]>;
@@ -14,11 +15,17 @@ type SavedGame = {
   elapsed: number;
   mistakes: number;
   completed: boolean;
+  recorded?: boolean;
+  completionDismissed?: boolean;
 };
 
 const DIFFICULTIES: Record<
   Difficulty,
-  { label: string; description: string; puzzle: string }
+  {
+    label: "简单" | "中等" | "困难";
+    description: string;
+    puzzle: string;
+  }
 > = {
   easy: {
     label: "简单",
@@ -182,7 +189,9 @@ export default function Home() {
   const [noteMode, setNoteMode] = useState(false);
   const [showDifficulty, setShowDifficulty] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(true);
   const difficultyMenuRef = useRef<HTMLDivElement>(null);
+  const completionRecordedRef = useRef(false);
 
   useEffect(() => {
     const initializeGame = window.setTimeout(() => {
@@ -204,6 +213,26 @@ export default function Home() {
   useEffect(() => {
     if (!game) return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(game));
+  }, [game]);
+
+  useEffect(() => {
+    if (!game?.completed || game.recorded || completionRecordedRef.current) {
+      return;
+    }
+    completionRecordedRef.current = true;
+    setShowCompletion(true);
+    recordScore({
+      gameId: "sudoku",
+      gameName: "纸上数独",
+      difficulty: DIFFICULTIES[game.difficulty].label,
+      elapsed: game.elapsed,
+      mistakes: game.mistakes,
+      detail: `${formatTime(game.elapsed)} 完成 · ${game.mistakes} 次错误`,
+      completed: true,
+    });
+    setGame((current) =>
+      current?.completed ? { ...current, recorded: true } : current,
+    );
   }, [game]);
 
   const isGameRunning = Boolean(game && !game.completed);
@@ -242,13 +271,23 @@ export default function Home() {
       if (value) counts[value] += 1;
     });
     return counts;
-  }, [game?.values]);
+  }, [game]);
 
   const chooseDifficulty = (difficulty: Difficulty) => {
+    completionRecordedRef.current = false;
+    setShowCompletion(true);
     setGame(createGame(difficulty));
     setSelectedCell(null);
     setNoteMode(false);
     setShowDifficulty(false);
+  };
+
+  const dismissCompletion = () => {
+    setShowCompletion(false);
+    if (!game.completed) return;
+    const dismissedGame = { ...game, completionDismissed: true };
+    setGame(dismissedGame);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(dismissedGame));
   };
 
   const enterNumber = useCallback(
@@ -598,7 +637,7 @@ export default function Home() {
         </div>
       )}
 
-      {game.completed && (
+      {game.completed && !game.completionDismissed && showCompletion && (
         <div className="modal-backdrop">
           <section
             className="win-modal"
@@ -606,9 +645,13 @@ export default function Home() {
             aria-modal="true"
             aria-labelledby="win-title"
           >
-            <div className="win-mark" aria-hidden="true">
-              ✓
-            </div>
+            <button
+              className="modal-close"
+              aria-label="关闭完成提示"
+              onClick={dismissCompletion}
+            >
+              ×
+            </button>
             <p className="eyebrow">完成挑战</p>
             <h2 id="win-title">漂亮的一局！</h2>
             <p>
