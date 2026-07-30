@@ -73,6 +73,14 @@ Web Audio 会在首次用户操作后解锁，符合浏览器自动播放限制�
 和设置恢复。Playwright 覆盖页面加载、无未处理异常、进入游戏、移动、跳跃、射击、
 暂停/继续、失败重启、Boss 跳转、胜利结算及重启后的实体状态清理。
 
+首次运行端到端测试前安装测试浏览器；Linux CI 可使用 `--with-deps` 一并安装系统库：
+
+```bash
+npx playwright install chromium
+# Linux CI: npx playwright install --with-deps chromium
+npm run test:e2e
+```
+
 ## 当前限制
 
 - 首版仅支持桌面键盘，触屏和手柄输入保留为后续扩展点。
