@@ -35,6 +35,622 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Iron Recoil keeps its industrial HUD isolated from the paper arcade theme. */
+.iron-page {
+  --iron-bg: #0d151c;
+  --iron-panel: #17242c;
+  --iron-line: #53666c;
+  --iron-text: #eef2d0;
+  --iron-dim: #91a3a3;
+  --iron-yellow: #f2c14e;
+  --iron-orange: #e76243;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgb(255 255 255 / 2%) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / 2%) 1px, transparent 1px),
+    var(--iron-bg);
+  background-size: 28px 28px;
+  color: var(--iron-text);
+  font-family: "Courier New", ui-monospace, monospace;
+}
+
+.iron-header,
+.iron-footer {
+  display: flex;
+  width: min(1420px, calc(100% - 36px));
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 auto;
+}
+
+.iron-header {
+  height: 72px;
+  border-bottom: 1px solid rgb(145 163 163 / 28%);
+}
+
+.iron-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.iron-brand > span {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 2px solid var(--iron-yellow);
+  color: var(--iron-yellow);
+  font-size: 13px;
+  font-weight: 900;
+  transform: skew(-7deg);
+}
+
+.iron-brand strong,
+.iron-brand small {
+  display: block;
+}
+
+.iron-brand strong {
+  font-size: 15px;
+  letter-spacing: 0.15em;
+}
+
+.iron-brand small {
+  margin-top: 3px;
+  color: var(--iron-dim);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+}
+
+.iron-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.iron-header-actions > button,
+.iron-header-actions .menu-pwa-button {
+  min-height: 34px;
+  border: 1px solid rgb(145 163 163 / 38%);
+  border-radius: 0;
+  padding: 0 12px;
+  background: transparent;
+  color: var(--iron-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.iron-header-actions .menu-action-label {
+  display: none;
+}
+
+.iron-game-shell {
+  position: relative;
+  width: min(1420px, calc(100% - 36px));
+  aspect-ratio: 16 / 9;
+  max-height: calc(100vh - 118px);
+  margin: 16px auto 0;
+  overflow: hidden;
+  border: 1px solid #53666c;
+  background: #101922;
+  box-shadow:
+    0 24px 80px rgb(0 0 0 / 45%),
+    inset 0 0 0 4px rgb(9 15 20 / 70%);
+}
+
+.iron-game-shell::before {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  border: 8px solid rgb(13 21 28 / 24%);
+  content: "";
+  pointer-events: none;
+}
+
+.iron-canvas-mount {
+  position: absolute;
+  inset: 0;
+}
+
+.iron-canvas-mount canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.iron-loading {
+  position: absolute;
+  z-index: 25;
+  inset: 0;
+  display: grid;
+  gap: 14px;
+  place-content: center;
+  background: #101922;
+  color: var(--iron-dim);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+
+.iron-loading span {
+  display: block;
+  width: 180px;
+  height: 4px;
+  overflow: hidden;
+  background: #293840;
+}
+
+.iron-loading span::after {
+  display: block;
+  width: 42%;
+  height: 100%;
+  background: var(--iron-yellow);
+  content: "";
+  animation: iron-load 0.8s steps(5) infinite;
+}
+
+@keyframes iron-load {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(340%);
+  }
+}
+
+.iron-hud {
+  position: absolute;
+  z-index: 12;
+  top: 15px;
+  right: 18px;
+  left: 18px;
+  display: flex;
+  align-items: stretch;
+  pointer-events: none;
+}
+
+.hud-cluster {
+  min-width: 110px;
+  border-right: 1px solid rgb(238 242 208 / 20%);
+  padding: 7px 14px 6px;
+  background: rgb(8 15 20 / 78%);
+}
+
+.hud-cluster:first-child {
+  border-left: 3px solid var(--iron-yellow);
+}
+
+.hud-cluster.rescued {
+  margin-left: auto;
+  border-right: 3px solid #63e6be;
+  text-align: right;
+}
+
+.hud-cluster small,
+.boss-hud small {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--iron-dim);
+  font-size: clamp(6px, 0.62vw, 10px);
+  letter-spacing: 0.14em;
+}
+
+.hud-cluster strong {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  color: var(--iron-text);
+  font-size: clamp(8px, 0.85vw, 13px);
+  letter-spacing: 0.06em;
+}
+
+.hud-cluster strong b {
+  color: var(--iron-yellow);
+}
+
+.hud-health div {
+  display: flex;
+  gap: 3px;
+}
+
+.hud-health i {
+  width: clamp(9px, 1vw, 16px);
+  height: 5px;
+  background: #3e4d51;
+}
+
+.hud-health i.active {
+  background: var(--iron-orange);
+  box-shadow: 0 0 7px rgb(231 98 67 / 55%);
+}
+
+.boss-hud {
+  position: absolute;
+  z-index: 13;
+  bottom: 20px;
+  left: 50%;
+  width: min(580px, 72%);
+  padding: 9px 12px;
+  background: rgb(8 15 20 / 86%);
+  transform: translateX(-50%);
+}
+
+.boss-hud > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.boss-hud > i {
+  display: block;
+  height: 7px;
+  background: #3e3432;
+}
+
+.boss-hud > i b {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #e76243, #f2c14e);
+  transition: width 90ms linear;
+}
+
+.iron-overlay {
+  position: absolute;
+  z-index: 16;
+  inset: 0;
+  color: var(--iron-text);
+}
+
+.iron-title {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.86fr) minmax(260px, 0.7fr);
+  grid-template-rows: auto 1fr auto;
+  gap: 0 6vw;
+  padding: clamp(26px, 5vw, 74px) clamp(28px, 7vw, 112px);
+  background:
+    linear-gradient(90deg, rgb(10 17 23 / 95%) 42%, rgb(10 17 23 / 60%)),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 16px,
+      rgb(242 193 78 / 4%) 16px,
+      rgb(242 193 78 / 4%) 32px
+    );
+}
+
+.iron-title > p,
+.iron-dialog > p,
+.iron-settings p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--iron-yellow);
+  font-size: clamp(7px, 0.8vw, 11px);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.iron-title h1 {
+  align-self: center;
+  margin: 10px 0;
+  font-family: Impact, "Arial Narrow", sans-serif;
+  font-size: clamp(62px, 11vw, 168px);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 0.72;
+  text-shadow: 5px 5px 0 #2a3b42;
+}
+
+.iron-title h1 span {
+  color: var(--iron-orange);
+}
+
+.iron-brief {
+  display: flex;
+  align-self: center;
+  gap: 18px;
+  border-top: 1px solid rgb(145 163 163 / 44%);
+  border-bottom: 1px solid rgb(145 163 163 / 44%);
+  padding: 20px 0;
+}
+
+.iron-brief span {
+  color: var(--iron-yellow);
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.iron-brief p {
+  margin: 0;
+  color: #bdc8bf;
+  font-family:
+    "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  font-size: clamp(10px, 1vw, 14px);
+  line-height: 1.8;
+}
+
+.iron-title .iron-primary {
+  align-self: end;
+}
+
+.iron-primary {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  padding: 0 18px;
+  background: var(--iron-yellow);
+  color: #172025;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+}
+
+.iron-primary:hover {
+  background: #ffe083;
+}
+
+.iron-controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-self: end;
+  gap: 9px 18px;
+  color: var(--iron-dim);
+  font-size: clamp(7px, 0.7vw, 10px);
+}
+
+.iron-controls b {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--iron-text);
+}
+
+.iron-notice {
+  position: absolute;
+  z-index: 15;
+  top: 28%;
+  left: 50%;
+  border-left: 3px solid var(--iron-yellow);
+  padding: 8px 14px;
+  background: rgb(8 15 20 / 84%);
+  color: var(--iron-yellow);
+  font-size: clamp(8px, 1vw, 13px);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  transform: translateX(-50%);
+  animation: iron-notice 1.65s steps(6) both;
+}
+
+@keyframes iron-notice {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  15%,
+  78% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.iron-dialog {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  background: rgb(8 14 19 / 88%);
+  backdrop-filter: blur(3px);
+}
+
+.iron-dialog h2 {
+  margin: 7px 0 24px;
+  font-family: Impact, "Arial Narrow", sans-serif;
+  font-size: clamp(44px, 8vw, 104px);
+  font-style: italic;
+  letter-spacing: 0.03em;
+}
+
+.iron-dialog > span {
+  margin: -14px 0 24px;
+  color: var(--iron-dim);
+}
+
+.iron-dialog button {
+  width: min(320px, 70%);
+  min-height: 42px;
+  border: 1px solid rgb(145 163 163 / 45%);
+  margin: 4px 0;
+  background: rgb(18 31 38 / 80%);
+  color: var(--iron-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.iron-dialog .iron-primary {
+  border: 0;
+  background: var(--iron-yellow);
+  color: #172025;
+}
+
+.result-failed h2 {
+  color: #ef6a58;
+}
+
+.result-victory h2 {
+  color: #82edbd;
+}
+
+.result-victory dl {
+  display: flex;
+  width: min(420px, 75%);
+  gap: 1px;
+  margin: 0 0 18px;
+}
+
+.result-victory dl div {
+  flex: 1;
+  padding: 10px;
+  background: rgb(33 48 55 / 80%);
+}
+
+.result-victory dt {
+  color: var(--iron-dim);
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.result-victory dd {
+  margin: 4px 0 0;
+  color: var(--iron-yellow);
+  font-size: 14px;
+}
+
+.iron-settings {
+  position: absolute;
+  z-index: 30;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: min(430px, calc(100% - 32px));
+  gap: 13px;
+  border: 1px solid var(--iron-line);
+  padding: 24px;
+  background: #142129;
+  box-shadow: 0 28px 90px rgb(0 0 0 / 68%);
+  transform: translate(-50%, -50%);
+}
+
+.iron-settings h2 {
+  margin: 3px 0 8px;
+  font-family: Impact, "Arial Narrow", sans-serif;
+  font-size: 36px;
+  font-style: italic;
+}
+
+.iron-settings label {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  align-items: center;
+  border-bottom: 1px solid rgb(145 163 163 / 18%);
+  padding-bottom: 10px;
+  color: #c8d2c8;
+  font-family:
+    "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  font-size: 12px;
+}
+
+.iron-settings input[type="range"] {
+  accent-color: var(--iron-yellow);
+}
+
+.iron-settings .toggle-row input {
+  justify-self: end;
+  width: 34px;
+  height: 18px;
+  accent-color: var(--iron-yellow);
+}
+
+.iron-debug {
+  position: absolute;
+  z-index: 14;
+  right: 16px;
+  bottom: 16px;
+  margin: 0;
+  border-left: 2px solid #63e6be;
+  padding: 8px 10px;
+  background: rgb(5 12 15 / 82%);
+  color: #63e6be;
+  font-size: clamp(6px, 0.65vw, 9px);
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.iron-footer {
+  height: 30px;
+  color: #6f8589;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 760px) {
+  .iron-page {
+    min-height: 100svh;
+  }
+
+  .iron-header {
+    height: 56px;
+  }
+
+  .iron-header-actions .menu-action-label,
+  .iron-header-actions > button {
+    display: none;
+  }
+
+  .iron-game-shell {
+    width: 100%;
+    max-height: none;
+    margin-top: 8px;
+    border-right: 0;
+    border-left: 0;
+  }
+
+  .iron-title {
+    grid-template-columns: 1fr 0.8fr;
+    padding: 20px 24px;
+  }
+
+  .iron-title h1 {
+    font-size: clamp(48px, 16vw, 90px);
+  }
+
+  .iron-brief {
+    gap: 8px;
+    padding: 9px 0;
+  }
+
+  .iron-brief span {
+    font-size: 18px;
+  }
+
+  .iron-controls {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 8px;
+  }
+
+  .hud-cluster {
+    min-width: auto;
+    padding: 5px 7px;
+  }
+
+  .iron-footer {
+    width: calc(100% - 24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iron-loading span::after,
+  .iron-notice {
+    animation: none;
+  }
+}
+
 button,
 a {
   -webkit-tap-highlight-color: transparent;
@@ -2719,6 +3335,110 @@ footer {
   border-color: #f1c46f;
   background: #f1c46f;
   color: #223d36;
+}
+
+.iron-card .card-preview {
+  background:
+    linear-gradient(180deg, transparent 55%, rgb(8 15 20 / 75%)),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 31px,
+      rgb(255 255 255 / 4%) 32px
+    ),
+    #15252d;
+}
+
+.mini-iron {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.mini-iron-skyline {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 48%;
+  background:
+    linear-gradient(90deg, #263941 21%, transparent 21% 27%, #263941 27% 52%, transparent 52% 58%, #263941 58%),
+    #1e3038;
+  clip-path: polygon(0 24%, 14% 24%, 14% 0, 23% 0, 23% 28%, 37% 28%, 37% 12%, 53% 12%, 53% 31%, 72% 31%, 72% 2%, 82% 2%, 82% 25%, 100% 25%, 100% 100%, 0 100%);
+}
+
+.mini-iron-runner {
+  position: absolute;
+  z-index: 2;
+  bottom: 48px;
+  left: 25%;
+  width: 30px;
+  height: 48px;
+  background: #26363d;
+  box-shadow: 0 -13px 0 -4px #f2c14e;
+  transform: skew(-7deg);
+}
+
+.mini-iron-runner::before {
+  position: absolute;
+  top: 13px;
+  left: 22px;
+  width: 43px;
+  height: 8px;
+  background: #e9ebcc;
+  content: "";
+}
+
+.mini-iron-runner i,
+.mini-iron-runner b {
+  position: absolute;
+  bottom: -18px;
+  width: 8px;
+  height: 22px;
+  background: #6e8e92;
+}
+
+.mini-iron-runner i {
+  left: 3px;
+  transform: rotate(18deg);
+}
+
+.mini-iron-runner b {
+  right: 3px;
+  transform: rotate(-20deg);
+}
+
+.mini-iron-driller {
+  position: absolute;
+  z-index: 2;
+  right: 15%;
+  bottom: 42px;
+  width: 74px;
+  height: 55px;
+  background: #566b70;
+  box-shadow:
+    0 12px 0 -4px #25333a,
+    0 -12px 0 -7px #e76243;
+}
+
+.mini-iron-driller::after {
+  position: absolute;
+  top: 10px;
+  left: -28px;
+  border-top: 18px solid transparent;
+  border-right: 32px solid #95a4a2;
+  border-bottom: 18px solid transparent;
+  content: "";
+}
+
+.mini-iron-shot {
+  position: absolute;
+  z-index: 3;
+  top: 47%;
+  left: 43%;
+  width: 45px;
+  height: 3px;
+  background: #f2c14e;
+  box-shadow: 0 0 10px #f2c14e;
 }
 
 .hub-tools {

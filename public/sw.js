@@ -1,4 +1,4 @@
-const CACHE_NAME = "paper-arcade-v6";
+const CACHE_NAME = "paper-arcade-v7";
 const APP_SHELL = [
   "/",
   "/sudoku",
@@ -7,6 +7,7 @@ const APP_SHELL = [
   "/twilight-canopy",
   "/maze",
   "/crossword",
+  "/iron-recoil",
   "/tools/dice",
   "/history",
   "/privacy",
@@ -15,6 +16,8 @@ const APP_SHELL = [
   "/manifest-1024.webmanifest",
   "/manifest-sky-hop.webmanifest",
   "/manifest-twilight.webmanifest",
+  "/manifest-iron-recoil.webmanifest",
+  "/icon-iron-recoil.svg",
   "/icon-192.png",
   "/icon-512.png",
   "/icon-1024-192.png",
