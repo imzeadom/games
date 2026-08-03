@@ -12,6 +12,7 @@ Canonical URL: https://games.imzeadom.chatgpt.site/
 - [暮色拾星](https://games.imzeadom.chatgpt.site/twilight-canopy): 操控飞鼠在暮色林冠间自动弹跳，支持滑翔、气流救援、灵蝶翻倍计分与星尘解锁。
 - [纸上迷宫](https://games.imzeadom.chatgpt.site/maze): 随机生成且保证可解的迷宫，包含简单、中等、困难三档。
 - [Crossword 单词寻踪](https://games.imzeadom.chatgpt.site/crossword): 在交叉字母中寻找英文单词，并通过中文释义和简单例句学习词汇。
+- [Iron Recoil](https://games.imzeadom.chatgpt.site/iron-recoil): 原创柴油朋克 2D 横版跑枪救援游戏，包含三种武器、四类敌人、三名工人和三阶段移动钻探机 Boss。
 
 ## Tools
 
@@ -27,4 +28,5 @@ Canonical URL: https://games.imzeadom.chatgpt.site/
 - 不含广告、分析追踪或营销 Cookie。
 - 游戏进度仅保存在用户当前浏览器的 localStorage 中。
 - 云雀角色、天空背景与站点社交分享图为本站原创生成素材。
+- Iron Recoil 的程序像素图形、角色、敌人、关卡、图标与 Web Audio 合成音效均为本站原创。
 - [隐私说明](https://games.imzeadom.chatgpt.site/privacy)

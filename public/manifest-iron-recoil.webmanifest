@@ -1,0 +1,19 @@
+{
+  "name": "Iron Recoil",
+  "short_name": "Iron Recoil",
+  "description": "原创柴油朋克 2D 横版跑枪救援游戏",
+  "start_url": "/iron-recoil",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#101922",
+  "theme_color": "#101922",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "/icon-iron-recoil.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
