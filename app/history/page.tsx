@@ -20,6 +20,13 @@ const GAME_OPTIONS: { id: "all" | GameId; label: string }[] = [
   { id: "maze", label: "纸上迷宫" },
   { id: "crossword", label: "单词寻踪" },
 ];
+const PAGE_SIZE = 30;
+const DATE_FORMATTER = new Intl.DateTimeFormat("zh-CN", {
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
 
 function resultValue(entry: ScoreEntry) {
   if (entry.score !== undefined) return `${entry.score.toLocaleString()} 分`;
@@ -28,12 +35,7 @@ function resultValue(entry: ScoreEntry) {
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
+  return DATE_FORMATTER.format(new Date(value));
 }
 
 export default function ScoreHistory() {
@@ -41,6 +43,7 @@ export default function ScoreHistory() {
   const [gameFilter, setGameFilter] = useState<"all" | GameId>("all");
   const [difficultyFilter, setDifficultyFilter] = useState("all");
   const [confirmClear, setConfirmClear] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useEffect(() => {
     const refresh = () => setEntries(getScoreHistory());
@@ -64,6 +67,7 @@ export default function ScoreHistory() {
       ),
     [difficultyFilter, entries, gameFilter],
   );
+  const renderedEntries = visibleEntries.slice(0, visibleCount);
   const gamesPlayed = new Set(entries.map((entry) => entry.gameId)).size;
   const completed = entries.filter((entry) => entry.completed).length;
 
@@ -108,9 +112,10 @@ export default function ScoreHistory() {
               <span>游戏</span>
               <select
                 value={gameFilter}
-                onChange={(event) =>
-                  setGameFilter(event.target.value as "all" | GameId)
-                }
+                onChange={(event) => {
+                  setGameFilter(event.target.value as "all" | GameId);
+                  setVisibleCount(PAGE_SIZE);
+                }}
               >
                 {GAME_OPTIONS.map((option) => (
                   <option key={option.id} value={option.id}>
@@ -123,7 +128,10 @@ export default function ScoreHistory() {
               <span>难度</span>
               <select
                 value={difficultyFilter}
-                onChange={(event) => setDifficultyFilter(event.target.value)}
+                onChange={(event) => {
+                  setDifficultyFilter(event.target.value);
+                  setVisibleCount(PAGE_SIZE);
+                }}
               >
                 <option value="all">全部难度</option>
                 <option value="简单">简单</option>
@@ -143,32 +151,44 @@ export default function ScoreHistory() {
         </div>
 
         {visibleEntries.length > 0 ? (
-          <ol className="history-list">
-            {visibleEntries.map((entry) => (
-              <li key={entry.id}>
-                <span className="history-game-mark" aria-hidden="true">
-                  {entry.gameId === "maze"
-                    ? "迷"
-                    : entry.gameId === "crossword"
-                      ? "词"
-                      : entry.gameName.slice(0, 1)}
-                </span>
-                <div className="history-entry-copy">
-                  <div>
-                    <strong>{entry.gameName}</strong>
-                    {entry.difficulty && <span>{entry.difficulty}</span>}
+          <>
+            <ol className="history-list">
+              {renderedEntries.map((entry) => (
+                <li key={entry.id}>
+                  <span className="history-game-mark" aria-hidden="true">
+                    {entry.gameId === "maze"
+                      ? "迷"
+                      : entry.gameId === "crossword"
+                        ? "词"
+                        : entry.gameName.slice(0, 1)}
+                  </span>
+                  <div className="history-entry-copy">
+                    <div>
+                      <strong>{entry.gameName}</strong>
+                      {entry.difficulty && <span>{entry.difficulty}</span>}
+                    </div>
+                    <p>{entry.detail}</p>
                   </div>
-                  <p>{entry.detail}</p>
-                </div>
-                <div className="history-result">
-                  <strong>{resultValue(entry)}</strong>
-                  <time dateTime={entry.createdAt}>
-                    {formatDate(entry.createdAt)}
-                  </time>
-                </div>
-              </li>
-            ))}
-          </ol>
+                  <div className="history-result">
+                    <strong>{resultValue(entry)}</strong>
+                    <time dateTime={entry.createdAt}>
+                      {formatDate(entry.createdAt)}
+                    </time>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            {renderedEntries.length < visibleEntries.length && (
+              <button
+                className="secondary-button history-load-more"
+                type="button"
+                onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              >
+                加载更多（剩余 {visibleEntries.length - renderedEntries.length}{" "}
+                条）
+              </button>
+            )}
+          </>
         ) : (
           <div className="history-empty">
             <span aria-hidden="true">◎</span>

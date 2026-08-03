@@ -174,7 +174,12 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(serviceWorker, /twilight-canopy/);
   assert.match(serviceWorker, /crossword/);
   assert.match(serviceWorker, /SKIP_WAITING/);
+  assert.match(serviceWorker, /ASSET_REFERENCE_PATTERN/);
+  assert.match(serviceWorker, /precacheApp/);
   assert.match(serviceWorker, /cache: "no-store"/);
+  assert.match(serviceWorker, /isRscRequest/);
+  assert.match(serviceWorker, /request\.mode === "navigate"/);
+  assert.doesNotMatch(serviceWorker, /cache\.put\(event\.request/);
   assert.match(pwaRegister, /强制刷新/);
   assert.match(pwaRegister, /registration\.update\(\)/);
   assert.match(pwaRegister, /updateViaCache: "none"/);
@@ -205,6 +210,8 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(pwaRegister, /display-mode: standalone/);
   assert.match(pwaRegister, /installationHelpFor/);
   assert.match(pwaRegister, /添加到主屏幕/);
+  assert.match(pwaRegister, /useCachedDocumentNavigation/);
+  assert.match(pwaRegister, /window\.location\.assign/);
   assert.match(maze, /generateMaze/);
   assert.match(maze, /analysis\.reachable !== cells\.length/);
   assert.match(maze, /branchDepth/);

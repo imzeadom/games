@@ -1,16 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
 import "./globals.css";
 import { PwaRegister } from "./pwa-register";
 import { SITE_NAME, SITE_URL } from "./site";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get("host") ?? "localhost:3000";
-  const protocol =
-    requestHeaders.get("x-forwarded-proto") ??
-    (host.startsWith("localhost") ? "http" : "https");
-  const siteUrl = `${protocol}://${host}`;
+export const metadata: Metadata = (() => {
   const title = "纸上游戏厅｜七款轻松小游戏与实用工具";
   const description =
     "数独、迷宫、Crossword 单词寻踪与原创休闲小游戏，支持历史成绩、离线游玩和安装到手机主屏幕。";
@@ -63,21 +56,21 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     openGraph: {
       type: "website",
-      url: siteUrl,
+      url: SITE_URL,
       title,
       description,
       siteName: SITE_NAME,
       locale: "zh_CN",
-      images: [{ url: `${siteUrl}/og.png`, width: 1731, height: 909 }],
+      images: [{ url: `${SITE_URL}/og.png`, width: 1731, height: 909 }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [`${siteUrl}/og.png`],
+      images: [`${SITE_URL}/og.png`],
     },
   };
-}
+})();
 
 export const viewport: Viewport = {
   width: "device-width",
