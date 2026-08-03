@@ -2986,6 +2986,13 @@ footer {
   border-bottom: 0;
 }
 
+.history-load-more {
+  display: block;
+  width: auto;
+  min-width: 210px;
+  margin: 22px auto;
+}
+
 .history-game-mark {
   display: grid;
   width: 42px;

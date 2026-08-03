@@ -133,6 +133,27 @@ export function PwaRegister({ children }: { children: ReactNode }) {
       setIsInstalled(true);
     };
     const standaloneQuery = window.matchMedia("(display-mode: standalone)");
+    const useCachedDocumentNavigation = (event: MouseEvent) => {
+      if (navigator.onLine || event.defaultPrevented || event.button !== 0) {
+        return;
+      }
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const link = target.closest<HTMLAnchorElement>("a[href]");
+      if (!link || link.target || link.hasAttribute("download")) return;
+
+      const url = new URL(link.href, window.location.href);
+      if (url.origin !== window.location.origin) return;
+
+      // Client-side RSC navigation needs a network response. A full document
+      // navigation lets the service worker serve the precached page on iOS.
+      event.preventDefault();
+      window.location.assign(url.href);
+    };
     const updateInstalledState = () => {
       const iosNavigator = navigator as Navigator & { standalone?: boolean };
       setIsInstalled(
@@ -144,12 +165,14 @@ export function PwaRegister({ children }: { children: ReactNode }) {
 
     window.addEventListener("beforeinstallprompt", onInstallAvailable);
     window.addEventListener("appinstalled", onInstalled);
+    document.addEventListener("click", useCachedDocumentNavigation, true);
     standaloneQuery.addEventListener("change", updateInstalledState);
     updateInstalledState();
 
     return () => {
       window.removeEventListener("beforeinstallprompt", onInstallAvailable);
       window.removeEventListener("appinstalled", onInstalled);
+      document.removeEventListener("click", useCachedDocumentNavigation, true);
       standaloneQuery.removeEventListener("change", updateInstalledState);
     };
   }, []);
