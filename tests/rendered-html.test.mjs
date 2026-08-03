@@ -82,6 +82,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     dice,
     history,
     vocabulary,
+    otherVocabulary,
     pwaRegister,
   ] =
     await Promise.all([
@@ -104,6 +105,10 @@ test("ships animated games, original art, privacy, and discovery assets", async 
       readFile(new URL("../app/history/page.tsx", import.meta.url), "utf8"),
       readFile(
         new URL("../app/crossword/vocabulary.ts", import.meta.url),
+        "utf8",
+      ),
+      readFile(
+        new URL("../app/crossword/other-vocabulary.ts", import.meta.url),
         "utf8",
       ),
       readFile(new URL("../app/pwa-register.tsx", import.meta.url), "utf8"),
@@ -211,20 +216,36 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.doesNotMatch(maze, /留在这一局查看路径/);
   assert.match(maze, /label: "困难"/);
   assert.match(maze, /recordScore/);
+  assert.match(maze, /PRINT_COUNTS = \[1, 5, 10, 20\]/);
+  assert.match(maze, /生成并打印/);
+  assert.match(maze, /printMazes/);
   assert.match(crossword, /VOCABULARY/);
-  assert.match(crossword, /从 1000 词分级词库中随机出题/);
+  assert.match(crossword, /从 250 个动词原形和 750 个其他常用词中随机出题/);
   assert.match(crossword, /label: "困难"/);
   assert.match(crossword, /showWinModal/);
   assert.match(crossword, /aria-label="关闭完成提示"/);
   assert.match(crossword, /size: 10/);
   assert.match(crossword, /size: 12/);
+  assert.match(crossword, /PRINT_COUNTS = \[1, 5, 10, 20\]/);
+  assert.match(crossword, /生成并打印/);
+  assert.match(crossword, /printPuzzles/);
+  assert.doesNotMatch(crossword, /例句|activeWord|word-example/);
   assert.match(vocabulary, /VOCABULARY\.length !== 1000/);
-  assert.match(vocabulary, /is used after “he”, “she”, or “it”/);
-  assert.doesNotMatch(vocabulary, /She often/);
+  assert.match(vocabulary, /VERB_SEEDS\.length !== 250/);
+  assert.match(vocabulary, /OTHER_WORDS\.length !== 750/);
+  assert.doesNotMatch(vocabulary, /formsFor|FORM_LABELS|EXAMPLES|example:/);
+  assert.match(otherVocabulary, /parseSeeds\(NOUN_SEEDS, "名词"\)/);
+  assert.match(otherVocabulary, /parseSeeds\(ADJECTIVE_SEEDS, "形容词"\)/);
+  assert.match(otherVocabulary, /parseSeeds\(ADVERB_SEEDS, "副词"\)/);
   assert.ok(
-    vocabulary.split("\n").filter((line) => /^\w+\|.+$/.test(line)).length >=
-      250,
+    [vocabulary, otherVocabulary]
+      .join("\n")
+      .split("\n")
+      .filter((line) => /^\w+\|.+$/.test(line)).length >= 1000,
   );
+  assert.match(styles, /@media print/);
+  assert.match(styles, /\.print-sheet/);
+  assert.match(styles, /break-after: page/);
   assert.match(dice, /DICE_SIDES = \[6, 8, 10, 12, 20\]/);
   assert.match(dice, /D6_PIPS/);
   assert.doesNotMatch(dice, /⚀|⚁|⚂|⚃|⚄|⚅/);

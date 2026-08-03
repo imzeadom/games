@@ -1,10 +1,13 @@
+import {
+  OTHER_VOCABULARY_SEEDS,
+  type VocabularyPart,
+} from "./other-vocabulary";
+
 export type VocabularyWord = {
   word: string;
   meaning: string;
-  example: string;
-  translation: string;
+  partOfSpeech: VocabularyPart | "动词";
   level: "easy" | "medium" | "hard";
-  family: string;
 };
 
 const VERB_SEEDS = `
@@ -299,88 +302,42 @@ weigh|称重
   })
   .slice(0, 250);
 
-const DOUBLE_FINAL = new Set([
-  "admit",
-  "control",
-  "drag",
-  "drop",
-  "plan",
-  "prefer",
-  "shop",
-  "step",
-  "stop",
-]);
-
-function formsFor(word: string) {
-  const consonantY = /[^aeiou]y$/.test(word);
-  const endsWithE = word.endsWith("e");
-  const dropsEForIng = endsWithE && !word.endsWith("ee");
-  const doubles = DOUBLE_FINAL.has(word);
-  const final = word.slice(-1);
-  const third = consonantY
-    ? `${word.slice(0, -1)}ies`
-    : /(s|sh|ch|x|z|o)$/.test(word)
-      ? `${word}es`
-      : `${word}s`;
-  const past = consonantY
-    ? `${word.slice(0, -1)}ied`
-    : endsWithE
-      ? `${word}d`
-      : doubles
-        ? `${word}${final}ed`
-        : `${word}ed`;
-  const continuous = dropsEForIng
-    ? `${word.slice(0, -1)}ing`
-    : doubles
-      ? `${word}${final}ing`
-      : `${word}ing`;
-  return [word, third, past, continuous];
-}
-
 function levelFor(word: string): VocabularyWord["level"] {
   if (word.length <= 5) return "easy";
   if (word.length <= 8) return "medium";
   return "hard";
 }
 
-const FORM_LABELS = ["原形", "第三人称单数", "过去式", "进行时"] as const;
-const EXAMPLES = [
-  (form: string, base: string) =>
-    `“${form}” is the base form of the verb “${base}”.`,
-  (form: string) =>
-    `“${form}” is used after “he”, “she”, or “it” in the present tense.`,
-  (form: string) =>
-    `“${form}” shows that the action happened in the past.`,
-  (form: string, base: string) =>
-    `“${form}” is the -ing form of the verb “${base}”.`,
-] as const;
-const EXAMPLE_TRANSLATIONS = [
-  (form: string, base: string) =>
-    `“${form}”是动词“${base}”的原形。`,
-  (form: string) =>
-    `现在时中，“${form}”用于 he、she 或 it 之后。`,
-  (form: string) => `“${form}”表示动作发生在过去。`,
-  (form: string, base: string) =>
-    `“${form}”是动词“${base}”的 -ing 形式。`,
-] as const;
+const usedWords = new Set(VERB_SEEDS.map(({ word }) => word));
+const OTHER_WORDS = OTHER_VOCABULARY_SEEDS.filter(({ word }) => {
+  const normalized = word.toLowerCase();
+  if (!/^[a-z]+$/.test(normalized) || usedWords.has(normalized)) return false;
+  usedWords.add(normalized);
+  return true;
+}).slice(0, 750);
 
-export const VOCABULARY: VocabularyWord[] = VERB_SEEDS.flatMap(
-  ({ word, meaning }) =>
-    formsFor(word).map((form, index) => ({
-      word: form.toUpperCase(),
-      meaning: `${meaning}（${FORM_LABELS[index]}）`,
-      example: EXAMPLES[index](form, word),
-      translation: `${EXAMPLE_TRANSLATIONS[index](form, word)}这个词表示“${meaning}”。`,
-      level: levelFor(form),
-      family: word,
-    })),
-);
+export const VOCABULARY: VocabularyWord[] = [
+  ...VERB_SEEDS.map(({ word, meaning }) => ({
+    word: word.toUpperCase(),
+    meaning,
+    partOfSpeech: "动词" as const,
+    level: levelFor(word),
+  })),
+  ...OTHER_WORDS.map(({ word, meaning, partOfSpeech }) => ({
+    word: word.toUpperCase(),
+    meaning,
+    partOfSpeech,
+    level: levelFor(word),
+  })),
+];
 
 if (
+  VERB_SEEDS.length !== 250 ||
+  OTHER_WORDS.length !== 750 ||
   VOCABULARY.length !== 1000 ||
   new Set(VOCABULARY.map((item) => item.word)).size !== 1000
 ) {
   throw new Error(
-    `Crossword vocabulary must contain 1000 unique words, got ${VOCABULARY.length}`,
+    `Crossword vocabulary must contain 250 verbs and 750 other unique words, got ${VERB_SEEDS.length} + ${OTHER_WORDS.length}`,
   );
 }

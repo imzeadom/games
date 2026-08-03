@@ -19,6 +19,7 @@ type MazeState = {
   shortestPath: number;
   branchDepth: number;
 };
+const PRINT_COUNTS = [1, 5, 10, 20] as const;
 
 const DIFFICULTIES: Record<
   Difficulty,
@@ -272,6 +273,9 @@ export default function MazeGame() {
   const [elapsed, setElapsed] = useState(0);
   const [won, setWon] = useState(false);
   const [showWinModal, setShowWinModal] = useState(false);
+  const [printCount, setPrintCount] = useState(10);
+  const [printMazes, setPrintMazes] = useState<MazeState[] | null>(null);
+  const [preparingPrint, setPreparingPrint] = useState(false);
   const pointerStart = useRef<[number, number] | null>(null);
 
   const startGame = useCallback((nextDifficulty: Difficulty) => {
@@ -298,6 +302,18 @@ export default function MazeGame() {
     );
     return () => window.clearInterval(timer);
   }, [maze, won]);
+
+  useEffect(() => {
+    if (!printMazes) return;
+    const frame = window.requestAnimationFrame(() => window.print());
+    return () => window.cancelAnimationFrame(frame);
+  }, [printMazes]);
+
+  useEffect(() => {
+    const finishPrinting = () => setPrintMazes(null);
+    window.addEventListener("afterprint", finishPrinting);
+    return () => window.removeEventListener("afterprint", finishPrinting);
+  }, []);
 
   const move = useCallback(
     (directionName: Direction) => {
@@ -367,6 +383,18 @@ export default function MazeGame() {
     }
   };
 
+  const printBatch = () => {
+    setPreparingPrint(true);
+    window.setTimeout(() => {
+      setPrintMazes(
+        Array.from({ length: printCount }, () =>
+          generateMaze(DIFFICULTIES[difficulty].size),
+        ),
+      );
+      setPreparingPrint(false);
+    }, 0);
+  };
+
   if (!maze) {
     return <main className="loading-screen">正在折出一座新迷宫…</main>;
   }
@@ -416,6 +444,28 @@ export default function MazeGame() {
               </button>
             ))}
           </div>
+          <section className="batch-print-bar is-compact" aria-label="批量打印迷宫">
+            <div>
+              <strong>批量练习</strong>
+              <span>每页 1 座，使用当前难度</span>
+            </div>
+            <label>
+              页数
+              <select
+                value={printCount}
+                onChange={(event) => setPrintCount(Number(event.target.value))}
+              >
+                {PRINT_COUNTS.map((count) => (
+                  <option key={count} value={count}>
+                    {count} 页 / {count} 座
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button onClick={printBatch} disabled={preparingPrint}>
+              {preparingPrint ? "正在生成…" : `生成并打印 ${printCount} 页`}
+            </button>
+          </section>
           <p className="desktop-tip">
             <span aria-hidden="true">↑</span>
             方向键 / WASD / 滑动均可移动
@@ -526,6 +576,58 @@ export default function MazeGame() {
             </Link>
           </section>
         </div>
+      )}
+
+      {printMazes && (
+        <section className="print-collection" aria-label="迷宫打印页">
+          {printMazes.map((printMaze, mazeIndex) => (
+            <article className="print-sheet" key={mazeIndex}>
+              <header className="print-sheet-heading">
+                <div>
+                  <p>PAPER MAZE</p>
+                  <h1>纸上迷宫</h1>
+                </div>
+                <span>
+                  {DIFFICULTIES[difficulty].label} · {mazeIndex + 1}/
+                  {printMazes.length}
+                </span>
+              </header>
+              <p className="print-instructions">
+                从左上角的起点出发，找到通往右下角终点的路。
+              </p>
+              <div
+                className="print-maze-board"
+                style={{ "--maze-size": printMaze.size } as CSSProperties}
+              >
+                {printMaze.cells.map((walls, cellIndex) => (
+                  <span
+                    className={[
+                      "print-maze-cell",
+                      cellIndex === 0 ? "is-start" : "",
+                      cellIndex === printMaze.cells.length - 1
+                        ? "is-exit"
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    key={cellIndex}
+                    style={cellStyle(walls)}
+                  >
+                    {cellIndex === 0
+                      ? "起"
+                      : cellIndex === printMaze.cells.length - 1
+                        ? "终"
+                        : ""}
+                  </span>
+                ))}
+              </div>
+              <footer className="print-maze-footer">
+                <span>姓名：________________</span>
+                <span>用时：________________</span>
+              </footer>
+            </article>
+          ))}
+        </section>
       )}
     </main>
   );

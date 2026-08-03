@@ -3420,6 +3420,87 @@ footer {
   font-size: 9px;
 }
 
+.batch-print-bar {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  border: 1px solid rgb(23 35 31 / 16%);
+  border-top: 0;
+  padding: 13px 16px;
+  background: rgb(255 253 248 / 58%);
+}
+
+.batch-print-bar > div {
+  min-width: 0;
+  margin-right: auto;
+}
+
+.batch-print-bar strong,
+.batch-print-bar span {
+  display: block;
+}
+
+.batch-print-bar strong {
+  font-family: "STSong", "SimSun", serif;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.batch-print-bar span {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.batch-print-bar label {
+  color: var(--muted);
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.batch-print-bar select {
+  margin-left: 7px;
+  border: 1px solid rgb(23 35 31 / 22%);
+  border-radius: 0;
+  padding: 7px 25px 7px 9px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+}
+
+.batch-print-bar > button {
+  border: 1px solid var(--ink);
+  padding: 8px 13px;
+  background: var(--ink);
+  color: white;
+  cursor: pointer;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.batch-print-bar > button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.batch-print-bar.is-compact {
+  display: grid;
+  max-width: 330px;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  border-top: 0;
+  padding: 12px 4px 0;
+  background: transparent;
+}
+
+.batch-print-bar.is-compact > div {
+  grid-column: 1 / -1;
+}
+
+.batch-print-bar.is-compact > button {
+  padding: 8px 10px;
+}
+
 .maze-game {
   width: 100%;
   max-width: 590px;
@@ -3766,7 +3847,7 @@ footer {
   border-top: 1px solid rgb(23 35 31 / 13%);
 }
 
-.word-list li button {
+.word-list-row {
   display: grid;
   width: 100%;
   grid-template-columns: 30px 1fr auto;
@@ -3775,17 +3856,10 @@ footer {
   border: 0;
   padding: 12px 3px;
   background: transparent;
-  cursor: pointer;
   text-align: left;
 }
 
-.word-list li button:hover {
-  padding-right: 8px;
-  padding-left: 8px;
-  background: var(--sage-light);
-}
-
-.word-list li button > span {
+.word-list-row > span {
   color: var(--muted);
   font-family: ui-monospace, monospace;
   font-size: 8px;
@@ -3813,59 +3887,17 @@ footer {
   font-weight: 400;
 }
 
-.word-list li button.is-found strong {
+.word-list-row.is-found strong {
   color: #728079;
   text-decoration: line-through;
 }
 
-.word-list li button.is-found b {
+.word-list-row.is-found b {
   color: #497063;
 }
 
-.word-example-backdrop {
-  position: fixed;
-  z-index: 110;
-  display: grid;
-  inset: 0;
-  place-items: center;
-  padding: 20px;
-  background: rgb(23 35 31 / 55%);
-  backdrop-filter: blur(5px);
-}
-
-.word-example {
-  position: relative;
-  width: min(510px, 100%);
-  border: 1px solid rgb(23 35 31 / 18%);
-  padding: 42px;
-  background: var(--panel);
-  box-shadow: 0 30px 100px rgb(15 25 20 / 30%);
-}
-
-.word-example > span {
-  color: var(--accent);
-  font-size: 11px;
-}
-
-.word-example h2 {
-  margin: 5px 0 28px;
-  font-family: ui-monospace, monospace;
-  font-size: 36px;
-}
-
-.word-example p {
-  margin: 0;
-  color: var(--ink);
-  font-family: Georgia, serif;
-  font-size: 20px;
-  line-height: 1.55;
-}
-
-.word-example small {
-  display: block;
-  margin: 10px 0 30px;
-  color: var(--muted);
-  font-size: 11px;
+.print-collection {
+  display: none;
 }
 
 @media (max-width: 900px) {
@@ -3909,6 +3941,10 @@ footer {
   }
 
   .maze-levels {
+    max-width: 100%;
+  }
+
+  .batch-print-bar.is-compact {
     max-width: 100%;
   }
 
@@ -4123,6 +4159,22 @@ footer {
     display: none;
   }
 
+  .batch-print-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 10px;
+  }
+
+  .batch-print-bar > div {
+    width: 100%;
+    flex-basis: 100%;
+  }
+
+  .batch-print-bar.is-compact {
+    display: grid;
+    padding: 12px 2px 0;
+  }
+
   .crossword-layout {
     padding: 28px 0;
   }
@@ -4153,15 +4205,171 @@ footer {
     border-left: 0;
   }
 
-  .word-example {
-    padding: 36px 24px 25px;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 12mm;
+}
+
+@media print {
+  html,
+  body {
+    width: 100%;
+    min-height: 0;
+    background: white;
   }
 
-  .word-example h2 {
-    font-size: 30px;
+  body {
+    color: #111;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
-  .word-example p {
-    font-size: 17px;
+  .maze-shell,
+  .crossword-shell {
+    width: 100%;
+    padding: 0;
+    background: white;
+  }
+
+  .maze-shell > :not(.print-collection),
+  .crossword-shell > :not(.print-collection) {
+    display: none !important;
+  }
+
+  .print-collection {
+    display: block;
+  }
+
+  .print-sheet {
+    display: flex;
+    min-height: 273mm;
+    box-sizing: border-box;
+    flex-direction: column;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .print-sheet:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .print-sheet-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1px solid #111;
+    padding-bottom: 4mm;
+  }
+
+  .print-sheet-heading p {
+    margin: 0 0 1mm;
+    font-family: ui-monospace, monospace;
+    font-size: 8pt;
+    letter-spacing: 0.18em;
+  }
+
+  .print-sheet-heading h1 {
+    margin: 0;
+    font-family: "STSong", "SimSun", serif;
+    font-size: 25pt;
+    font-weight: 500;
+  }
+
+  .print-sheet-heading > span {
+    margin-bottom: 1mm;
+    font-family: ui-monospace, monospace;
+    font-size: 9pt;
+  }
+
+  .print-instructions {
+    margin: 5mm 0 7mm;
+    font-size: 10pt;
+  }
+
+  .print-maze-board {
+    --maze-wall: #111;
+
+    display: grid;
+    width: min(176mm, 100%);
+    align-self: center;
+    aspect-ratio: 1;
+    grid-template-columns: repeat(var(--maze-size), 1fr);
+    border: 1.5px solid #111;
+  }
+
+  .print-maze-cell {
+    display: grid;
+    min-width: 0;
+    aspect-ratio: 1;
+    place-items: center;
+    border-width: 0.55px;
+    border-style: solid;
+    font-family: "STSong", "SimSun", serif;
+    font-size: clamp(5pt, calc(64pt / var(--maze-size)), 9pt);
+    font-weight: 700;
+  }
+
+  .print-maze-cell.is-start {
+    background: #e5e5e5;
+  }
+
+  .print-maze-cell.is-exit {
+    background: #d1d1d1;
+  }
+
+  .print-maze-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+    border-top: 1px solid #aaa;
+    padding-top: 4mm;
+    font-size: 9pt;
+  }
+
+  .print-crossword-board {
+    display: grid;
+    width: min(164mm, 100%);
+    align-self: center;
+    aspect-ratio: 1;
+    grid-template-columns: repeat(var(--crossword-size), 1fr);
+    border: 2px solid #111;
+  }
+
+  .print-crossword-board span {
+    display: grid;
+    min-width: 0;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 0.35px solid #999;
+    font-family: ui-monospace, monospace;
+    font-size: clamp(10pt, calc(112pt / var(--crossword-size)), 14pt);
+    font-weight: 700;
+  }
+
+  .print-word-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2mm 10mm;
+    margin: 7mm 0 0;
+    padding-left: 7mm;
+  }
+
+  .print-word-list li {
+    padding-left: 1mm;
+    font-size: 9pt;
+  }
+
+  .print-word-list strong {
+    margin-right: 2mm;
+    font-family: ui-monospace, monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .print-word-list span {
+    color: #444;
+    font-size: 8pt;
   }
 }

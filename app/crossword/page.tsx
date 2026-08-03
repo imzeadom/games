@@ -14,12 +14,10 @@ import { PwaMenuActions } from "../pwa-register";
 import { VOCABULARY, type VocabularyWord } from "./vocabulary";
 
 type Difficulty = "easy" | "medium" | "hard";
-type Word = Pick<
-  VocabularyWord,
-  "word" | "meaning" | "example" | "translation"
->;
+type Word = Pick<VocabularyWord, "word" | "meaning" | "partOfSpeech">;
 type PlacedWord = Word & { positions: number[] };
 type Puzzle = { size: number; letters: string[]; words: PlacedWord[] };
+const PRINT_COUNTS = [1, 5, 10, 20] as const;
 
 const LEVELS: Record<
   Difficulty,
@@ -81,22 +79,19 @@ function shuffled<T>(items: T[]) {
 }
 
 function sampleVocabulary(difficulty: Difficulty, count: number): Word[] {
-  const families = new Set<string>();
-  const selection: Word[] = [];
-  for (const item of shuffled(
-    VOCABULARY.filter((candidate) => candidate.level === difficulty),
-  )) {
-    if (families.has(item.family)) continue;
-    families.add(item.family);
-    selection.push({
-      word: item.word,
-      meaning: item.meaning,
-      example: item.example,
-      translation: item.translation,
-    });
-    if (selection.length === count) break;
-  }
-  return selection;
+  return shuffled(
+    VOCABULARY.filter(
+      (candidate) =>
+        candidate.level === difficulty &&
+        candidate.word.length <= LEVELS[difficulty].size,
+    ),
+  )
+    .slice(0, count)
+    .map(({ word, meaning, partOfSpeech }) => ({
+      word,
+      meaning,
+      partOfSpeech,
+    }));
 }
 
 function makePuzzle(difficulty: Difficulty): Puzzle {
@@ -204,7 +199,9 @@ export default function CrosswordGame() {
   const [elapsed, setElapsed] = useState(0);
   const [won, setWon] = useState(false);
   const [showWinModal, setShowWinModal] = useState(false);
-  const [activeWord, setActiveWord] = useState<Word | null>(null);
+  const [printCount, setPrintCount] = useState(10);
+  const [printPuzzles, setPrintPuzzles] = useState<Puzzle[] | null>(null);
+  const [preparingPrint, setPreparingPrint] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
   const dragged = useRef(false);
   const pointerAnchor = useRef<number | null>(null);
@@ -219,7 +216,6 @@ export default function CrosswordGame() {
     setElapsed(0);
     setWon(false);
     setShowWinModal(false);
-    setActiveWord(null);
   }, []);
 
   useEffect(() => {
@@ -236,6 +232,18 @@ export default function CrosswordGame() {
     return () => window.clearInterval(timer);
   }, [puzzle, won]);
 
+  useEffect(() => {
+    if (!printPuzzles) return;
+    const frame = window.requestAnimationFrame(() => window.print());
+    return () => window.cancelAnimationFrame(frame);
+  }, [printPuzzles]);
+
+  useEffect(() => {
+    const finishPrinting = () => setPrintPuzzles(null);
+    window.addEventListener("afterprint", finishPrinting);
+    return () => window.removeEventListener("afterprint", finishPrinting);
+  }, []);
+
   const completeSelection = useCallback(
     (positions: number[]) => {
       if (!puzzle || positions.length < 2 || won) {
@@ -251,7 +259,6 @@ export default function CrosswordGame() {
       if (match) {
         const nextFound = [...found, match.word];
         setFound(nextFound);
-        setActiveWord(match);
         if (nextFound.length === puzzle.words.length) {
           setWon(true);
           setShowWinModal(true);
@@ -311,6 +318,16 @@ export default function CrosswordGame() {
     );
   }, [found, puzzle]);
 
+  const printBatch = () => {
+    setPreparingPrint(true);
+    window.setTimeout(() => {
+      setPrintPuzzles(
+        Array.from({ length: printCount }, () => makePuzzle(difficulty)),
+      );
+      setPreparingPrint(false);
+    }, 0);
+  };
+
   if (!puzzle) {
     return <main className="loading-screen">正在把单词藏进字母里…</main>;
   }
@@ -335,7 +352,7 @@ export default function CrosswordGame() {
           <h1>在交错的字母里，找到今天的新词。</h1>
         </div>
         <p>
-          从 1000 词分级词库中随机出题。拖过一行字母来选词，点击词卡可查看简单英文例句。
+          从 250 个动词原形和 750 个其他常用词中随机出题，不再重复动词变形。
         </p>
       </section>
 
@@ -351,6 +368,29 @@ export default function CrosswordGame() {
           </button>
         ))}
       </div>
+
+      <section className="batch-print-bar" aria-label="批量打印单词寻踪">
+        <div>
+          <strong>批量练习</strong>
+          <span>每页 1 题，使用当前难度</span>
+        </div>
+        <label>
+          页数
+          <select
+            value={printCount}
+            onChange={(event) => setPrintCount(Number(event.target.value))}
+          >
+            {PRINT_COUNTS.map((count) => (
+              <option key={count} value={count}>
+                {count} 页 / {count} 题
+              </option>
+            ))}
+          </select>
+        </label>
+        <button onClick={printBatch} disabled={preparingPrint}>
+          {preparingPrint ? "正在生成…" : `生成并打印 ${printCount} 页`}
+        </button>
+      </section>
 
       <section className="crossword-layout">
         <div className="crossword-game">
@@ -435,24 +475,30 @@ export default function CrosswordGame() {
               <span>待寻找</span>
               <strong id="word-list-title">{puzzle.words.length} WORDS</strong>
             </div>
-            <small>点击查看例句</small>
+            <small>英语 · 词性 · 中文</small>
           </div>
           <ul>
             {puzzle.words.map((item, index) => {
               const isFound = found.includes(item.word);
               return (
                 <li key={item.word}>
-                  <button
-                    className={isFound ? "is-found" : ""}
-                    onClick={() => setActiveWord(item)}
+                  <div
+                    className={[
+                      "word-list-row",
+                      isFound ? "is-found" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                   >
                     <span>{(index + 1).toString().padStart(2, "0")}</span>
                     <div>
                       <strong>{item.word}</strong>
-                      <small>{item.meaning}</small>
+                      <small>
+                        {item.partOfSpeech} · {item.meaning}
+                      </small>
                     </div>
-                    <b aria-hidden="true">{isFound ? "✓" : "→"}</b>
-                  </button>
+                    <b aria-hidden="true">{isFound ? "✓" : "·"}</b>
+                  </div>
                 </li>
               );
             })}
@@ -460,36 +506,7 @@ export default function CrosswordGame() {
         </aside>
       </section>
 
-      {activeWord && (
-        <div
-          className="word-example-backdrop"
-          onPointerDown={(event) => {
-            if (event.target === event.currentTarget) setActiveWord(null);
-          }}
-        >
-          <section className="word-example" role="dialog" aria-modal="true">
-            <button
-              className="modal-close"
-              aria-label="关闭例句"
-              onClick={() => setActiveWord(null)}
-            >
-              ×
-            </button>
-            <span>{activeWord.meaning}</span>
-            <h2>{activeWord.word}</h2>
-            <p>“{activeWord.example}”</p>
-            <small>{activeWord.translation}</small>
-            <button
-              className="primary-button"
-              onClick={() => setActiveWord(null)}
-            >
-              {won ? "查看完成结果" : "记住了，继续找"}
-            </button>
-          </section>
-        </div>
-      )}
-
-      {won && showWinModal && !activeWord && (
+      {won && showWinModal && (
         <div className="modal-backdrop">
           <section className="win-modal" role="dialog" aria-modal="true">
             <button
@@ -502,7 +519,7 @@ export default function CrosswordGame() {
             <p className="eyebrow">全部找到</p>
             <h2>今天的词都收下了！</h2>
             <p>
-              用时 {formatDuration(elapsed)}，共误选 {mistakes} 次。点击词卡仍可复习例句。
+              用时 {formatDuration(elapsed)}，共误选 {mistakes} 次。
             </p>
             <button
               className="primary-button"
@@ -515,6 +532,48 @@ export default function CrosswordGame() {
             </Link>
           </section>
         </div>
+      )}
+
+      {printPuzzles && (
+        <section className="print-collection" aria-label="单词寻踪打印页">
+          {printPuzzles.map((printPuzzle, puzzleIndex) => (
+            <article className="print-sheet" key={puzzleIndex}>
+              <header className="print-sheet-heading">
+                <div>
+                  <p>WORD SEARCH</p>
+                  <h1>单词寻踪</h1>
+                </div>
+                <span>
+                  {LEVELS[difficulty].label} · {puzzleIndex + 1}/
+                  {printPuzzles.length}
+                </span>
+              </header>
+              <p className="print-instructions">
+                在字母表中找到下方的 {printPuzzle.words.length} 个单词。
+              </p>
+              <div
+                className="print-crossword-board"
+                style={
+                  { "--crossword-size": printPuzzle.size } as CSSProperties
+                }
+              >
+                {printPuzzle.letters.map((letter, position) => (
+                  <span key={position}>{letter}</span>
+                ))}
+              </div>
+              <ol className="print-word-list">
+                {printPuzzle.words.map((item) => (
+                  <li key={item.word}>
+                    <strong>{item.word}</strong>
+                    <span>
+                      {item.partOfSpeech} · {item.meaning}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </article>
+          ))}
+        </section>
       )}
     </main>
   );
