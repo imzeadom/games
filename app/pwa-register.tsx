@@ -15,10 +15,6 @@ type InstallPromptEvent = Event & {
 };
 
 const MANIFESTS = {
-  "/iron-recoil": {
-    href: "/manifest-iron-recoil.webmanifest",
-    label: "安装 Iron Recoil",
-  },
   "/1024": {
     href: "/manifest-1024.webmanifest",
     label: "安装 1024",

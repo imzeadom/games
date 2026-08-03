@@ -14,11 +14,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     { path: "/maze", priority: 0.9, changeFrequency: "monthly" as const },
     { path: "/crossword", priority: 0.9, changeFrequency: "monthly" as const },
-    {
-      path: "/iron-recoil",
-      priority: 0.95,
-      changeFrequency: "monthly" as const,
-    },
     { path: "/tools/dice", priority: 0.7, changeFrequency: "monthly" as const },
     { path: "/history", priority: 0.5, changeFrequency: "monthly" as const },
     { path: "/privacy", priority: 0.3, changeFrequency: "yearly" as const },
