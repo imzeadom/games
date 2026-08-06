@@ -1730,7 +1730,6 @@ footer {
     grid-row: 1 / 4;
   }
 
-  .compact-button,
   .copyright-note {
     display: none;
   }
