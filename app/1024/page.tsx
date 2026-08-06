@@ -190,7 +190,14 @@ export default function Merge1024() {
       const saved = window.localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
-          setGame(JSON.parse(saved) as MergeState);
+          const restoredGame = JSON.parse(saved) as MergeState;
+          setGame(restoredGame);
+          if (
+            !hasMoves(restoredGame.board) &&
+            !restoredGame.board.includes(1024)
+          ) {
+            setShowGameOver(true);
+          }
           return;
         } catch {
           window.localStorage.removeItem(STORAGE_KEY);
@@ -216,7 +223,22 @@ export default function Merge1024() {
     (direction: Direction) => {
       if (!game || animation || animationTimer.current) return;
       const result = moveBoard(game.board, direction);
-      if (!result.moved) return;
+      if (!result.moved) {
+        if (!hasMoves(game.board)) {
+          setShowGameOver(true);
+          if (!scoreRecorded.current) {
+            scoreRecorded.current = true;
+            recordScore({
+              gameId: "merge-1024",
+              gameName: "合成 1024",
+              score: game.score,
+              detail: "棋盘已满",
+              completed: false,
+            });
+          }
+        }
+        return;
+      }
 
       setAnimation(result.movements);
       animationTimer.current = window.setTimeout(() => {
@@ -340,7 +362,7 @@ export default function Merge1024() {
             </div>
           </div>
           <button className="primary-button compact-button" onClick={reset}>
-            重新开局
+            重新开始
           </button>
         </div>
 
@@ -441,7 +463,7 @@ export default function Merge1024() {
               </button>
             )}
             <button className="primary-button" onClick={reset}>
-              新游戏
+              重新开始
             </button>
           </section>
         </div>
