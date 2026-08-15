@@ -79,6 +79,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     serviceWorker,
     maze,
     crossword,
+    crosswordGenerator,
     dice,
     history,
     vocabulary,
@@ -101,6 +102,10 @@ test("ships animated games, original art, privacy, and discovery assets", async 
       readFile(new URL("../public/sw.js", import.meta.url), "utf8"),
       readFile(new URL("../app/maze/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/crossword/page.tsx", import.meta.url), "utf8"),
+      readFile(
+        new URL("../app/crossword/generator.ts", import.meta.url),
+        "utf8",
+      ),
       readFile(new URL("../app/tools/dice/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/history/page.tsx", import.meta.url), "utf8"),
       readFile(
@@ -219,13 +224,14 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(maze, /PRINT_COUNTS = \[1, 5, 10, 20\]/);
   assert.match(maze, /生成并打印/);
   assert.match(maze, /printMazes/);
-  assert.match(crossword, /VOCABULARY/);
+  assert.match(crosswordGenerator, /VOCABULARY/);
+  assert.match(crossword, /from "\.\/generator"/);
   assert.match(crossword, /从 250 个动词原形和 750 个其他常用词中随机出题/);
-  assert.match(crossword, /label: "困难"/);
+  assert.match(crosswordGenerator, /label: "困难"/);
   assert.match(crossword, /showWinModal/);
   assert.match(crossword, /aria-label="关闭完成提示"/);
-  assert.match(crossword, /size: 10/);
-  assert.match(crossword, /size: 12/);
+  assert.match(crosswordGenerator, /size: 10/);
+  assert.match(crosswordGenerator, /size: 12/);
   assert.match(crossword, /PRINT_COUNTS = \[1, 5, 10, 20\]/);
   assert.match(crossword, /生成并打印/);
   assert.match(crossword, /printPuzzles/);
