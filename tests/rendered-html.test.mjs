@@ -30,7 +30,7 @@ async function render(pathname = "/") {
 
 test("server-renders the game hub and route-specific PWA metadata", async () => {
   const routes = [
-    ["/", "纸上游戏厅｜六款轻松小游戏与实用工具", "manifest.webmanifest"],
+    ["/", "纸上游戏厅｜七款轻松小游戏与实用工具", "manifest.webmanifest"],
     ["/sudoku", "纸上数独｜纸上游戏厅", "manifest-sudoku.webmanifest"],
     ["/1024", "合成 1024｜纸上游戏厅", "manifest-1024.webmanifest"],
     ["/sky-hop", "云雀跃｜纸上游戏厅", "manifest-sky-hop.webmanifest"],
@@ -47,6 +47,7 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
     ],
     ["/tools/dice", "骰子工具｜纸上游戏厅", "manifest.webmanifest"],
     ["/history", "历史成绩｜纸上游戏厅", "manifest.webmanifest"],
+    ["/hanzi-listen", "听音找汉字｜纸上游戏厅", "manifest.webmanifest"],
     ["/privacy", "隐私说明｜纸上游戏厅", "manifest.webmanifest"],
   ];
 
@@ -82,6 +83,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     crosswordGenerator,
     dice,
     history,
+    hanzi,
     vocabulary,
     otherVocabulary,
     pwaRegister,
@@ -108,6 +110,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
       ),
       readFile(new URL("../app/tools/dice/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/history/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/hanzi-listen/page.tsx", import.meta.url), "utf8"),
       readFile(
         new URL("../app/crossword/vocabulary.ts", import.meta.url),
         "utf8",
@@ -126,6 +129,10 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(hub, /纸上迷宫/);
   assert.match(hub, /Crossword · 单词寻踪/);
   assert.match(hub, /掷骰子/);
+  assert.match(hub, /听音找汉字/);
+  assert.match(hanzi, /SpeechSynthesisUtterance/);
+  assert.match(hanzi, /家长字库/);
+  assert.match(hanzi, /<PwaMenuActions \/>/);
   assert.match(sudoku, /label: "困难"/);
   assert.match(sudoku, /setNoteMode/);
   assert.match(sudoku, /completionDismissed/);
@@ -172,9 +179,10 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(site, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.match(llms, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.doesNotMatch(llms, /paper-sudoku-games/);
-  assert.match(serviceWorker, /paper-arcade-v7/);
+  assert.match(serviceWorker, /paper-arcade-v8/);
   assert.match(serviceWorker, /twilight-canopy/);
   assert.match(serviceWorker, /crossword/);
+  assert.match(serviceWorker, /hanzi-listen/);
   assert.match(serviceWorker, /SKIP_WAITING/);
   assert.match(serviceWorker, /ASSET_REFERENCE_PATTERN/);
   assert.match(serviceWorker, /precacheApp/);
@@ -201,6 +209,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     crossword,
     dice,
     history,
+    hanzi,
   ]) {
     assert.match(page, /<PwaMenuActions \/>/);
   }

@@ -1,4 +1,4 @@
-const CACHE_NAME = "paper-arcade-v7";
+const CACHE_NAME = "paper-arcade-v8";
 const ASSET_REFERENCE_PATTERN =
   /(?:\/assets\/|assets\/|\.\.?\/)[A-Za-z0-9_./-]+\.(?:css|js|woff2?)/g;
 const APP_SHELL = [
@@ -9,6 +9,7 @@ const APP_SHELL = [
   "/twilight-canopy",
   "/maze",
   "/crossword",
+  "/hanzi-listen",
   "/tools/dice",
   "/history",
   "/privacy",

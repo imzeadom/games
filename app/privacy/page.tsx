@@ -36,7 +36,7 @@ export default function PrivacyPage() {
             <span>01</span>
             <h2>保存在设备上的内容</h2>
             <p>
-              数独局面、1024 分数和云雀跃最高分使用浏览器 localStorage
+              数独局面、1024 分数、汉字成绩和自定义汉字字库使用浏览器 localStorage
               保存。PWA 服务工作线程会缓存页面、图标和原创游戏素材，以便离线游玩。
             </p>
           </section>

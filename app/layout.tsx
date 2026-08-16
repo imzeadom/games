@@ -4,9 +4,9 @@ import { PwaRegister } from "./pwa-register";
 import { SITE_NAME, SITE_URL } from "./site";
 
 export const metadata: Metadata = (() => {
-  const title = "纸上游戏厅｜六款轻松小游戏与实用工具";
+  const title = "纸上游戏厅｜七款轻松小游戏与实用工具";
   const description =
-    "数独、迷宫、Crossword 单词寻踪与原创休闲小游戏，支持历史成绩、离线游玩和安装到手机主屏幕。";
+    "数独、迷宫、听音找汉字、Crossword 单词寻踪与原创休闲小游戏，支持历史成绩、离线游玩和安装到手机主屏幕。";
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -24,6 +24,8 @@ export const metadata: Metadata = (() => {
       "迷宫游戏",
       "Crossword",
       "英语单词游戏",
+      "听音找汉字",
+      "汉字听音识字",
       "骰子工具",
       "离线游戏",
     ],

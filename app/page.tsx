@@ -121,6 +121,19 @@ const games = [
       </div>
     ),
   },
+  {
+    href: "/hanzi-listen",
+    number: "07",
+    title: "听音找汉字 · 小耳朵识字",
+    description: "听一听读音，在暖暖的识字花园里找到对应的汉字。",
+    action: "去听一听",
+    className: "hanzi-card",
+    preview: (
+      <div className="mini-hanzi" aria-hidden="true">
+        <span>☼</span><b>听</b><i>找</i><em>字</em>
+      </div>
+    ),
+  },
 ];
 
 export default function GamesHome() {
@@ -184,7 +197,7 @@ export default function GamesHome() {
         <div className="hub-actions">
           <Link href="/history">历史成绩</Link>
           <PwaMenuActions />
-          <span className="hub-count">六款小游戏 · 随时开局</span>
+          <span className="hub-count">七款小游戏 · 随时开局</span>
         </div>
       </header>
 
@@ -198,7 +211,7 @@ export default function GamesHome() {
           </h1>
         </div>
         <p>
-          六款轻量小游戏，不用注册进度也会留在当前设备。支持离线游玩，
+          七款轻量小游戏，不用注册进度也会留在当前设备。支持离线游玩，
           也可以分别安装到手机主屏幕。
         </p>
       </section>

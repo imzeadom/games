@@ -19,6 +19,7 @@ const GAME_OPTIONS: { id: "all" | GameId; label: string }[] = [
   { id: "twilight-canopy", label: "暮色拾星" },
   { id: "maze", label: "纸上迷宫" },
   { id: "crossword", label: "单词寻踪" },
+  { id: "hanzi-listen", label: "听音找汉字" },
 ];
 const PAGE_SIZE = 30;
 const DATE_FORMATTER = new Intl.DateTimeFormat("zh-CN", {
