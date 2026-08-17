@@ -130,7 +130,9 @@ const games = [
     className: "hanzi-card",
     preview: (
       <div className="mini-hanzi" aria-hidden="true">
-        <span>☼</span><b>听</b><i>找</i><em>字</em>
+        {/* Static PNG avoids a runtime image optimizer request on Sites. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/hanzi-listen-card.png" alt="" width={640} height={360} />
       </div>
     ),
   },
