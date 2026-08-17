@@ -20,8 +20,69 @@
 .hanzi-stage { display: grid; grid-template-columns: minmax(250px, .7fr) minmax(420px, 1fr); gap: clamp(36px, 8vw, 110px); align-items: center; max-width: 1060px; min-height: calc(100vh - 180px); margin: auto; }.hanzi-intro h1 { margin: 0; font-family: "STSong", serif; font-size: clamp(48px, 7vw, 82px); line-height: 1.08; font-weight: 500; }.hanzi-intro h1 em { color: var(--hz-coral); font-style: normal; }.hanzi-intro > p:last-of-type { max-width: 310px; color: #756f61; line-height: 1.8; }.hanzi-mode-picker { display: grid; gap: 7px; max-width: 285px; margin-top: 34px; }.hanzi-mode-picker button { display: flex; align-items: baseline; justify-content: space-between; border: 1px solid transparent; border-radius: 14px; padding: 10px 13px; background: rgb(255 255 255 / 35%); color: #665e51; cursor: pointer; text-align: left; }.hanzi-mode-picker button.is-current { border-color: var(--hz-coral); background: rgb(255 255 255 / 75%); color: #3c4036; box-shadow: 0 5px 0 rgb(228 111 92 / 13%); }.hanzi-mode-picker small { color: #9c8f7c; font-size: 10px; }.hanzi-board { position: relative; overflow: hidden; border: 2px solid #5d786c; border-radius: 28px; padding: 22px clamp(20px, 4vw, 46px) 28px; background: rgb(255 252 236 / 86%); box-shadow: 0 22px 0 rgb(95 157 136 / 12%), 0 30px 60px rgb(93 120 108 / 15%); }.hanzi-board::before, .hanzi-board::after { position: absolute; color: rgb(230 111 92 / 50%); font-size: 42px; content: "✿"; }.hanzi-board::before { top: 5px; right: 25px; }.hanzi-board::after { bottom: -8px; left: 20px; color: rgb(95 157 136 / 35%); transform: rotate(-20deg); }.hanzi-board-top { display: flex; justify-content: space-between; color: #958b77; font-size: 11px; letter-spacing: .08em; }.hanzi-listen { display: grid; justify-items: center; gap: 4px; padding: 23px 0 18px; text-align: center; }.hanzi-sun { display: grid; width: 63px; height: 63px; place-items: center; border-radius: 50%; background: #f7cb68; color: #fff9df; font-size: 40px; }.hanzi-listen p { margin: 7px 0; color: #756f61; }.listen-button { border: 0; border-radius: 999px; padding: 12px 26px; background: var(--hz-coral); color: white; cursor: pointer; font-weight: 700; box-shadow: 0 4px 0 #c45349; }.listen-button span { margin-right: 6px; }.sound-toggle { border: 0; background: transparent; color: #8b887a; cursor: pointer; font-size: 11px; }.sound-toggle.is-muted { text-decoration: line-through; }.hanzi-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }.hanzi-option { min-height: 82px; border: 1px solid #d8cbaa; border-radius: 17px; background: #fffdf5; color: #393d35; cursor: pointer; font-family: "STSong", serif; font-size: clamp(30px, 5vw, 43px); transition: transform .16s, border-color .16s, background .16s; }.hanzi-option:hover:not(:disabled) { transform: translateY(-3px); border-color: var(--hz-jade); }.hanzi-option.is-right { border-color: var(--hz-jade); background: #c9e6c6; animation: hanzi-bloom .55s ease; }.hanzi-option.is-wrong { border-color: var(--hz-coral); background: #ffd5c8; animation: hanzi-shake .35s ease; }.hanzi-feedback { min-height: 1.5em; margin: 19px 0 0; color: #635e51; text-align: center; font-size: 13px; }.hanzi-footer { display: flex; justify-content: space-between; max-width: 1060px; margin: 0 auto; color: #978a73; font-size: 11px; }.parent-link { border: 0; background: transparent; color: #756f61; cursor: pointer; text-decoration: underline; }.hanzi-modal-backdrop { position: fixed; z-index: 40; inset: 0; display: grid; place-items: center; padding: 18px; background: rgb(39 44 36 / 44%); }.hanzi-parent { position: relative; width: min(520px, 100%); max-height: min(680px, 90vh); overflow: auto; border-radius: 24px; padding: 30px; background: #fffdf5; box-shadow: 0 25px 80px rgb(20 38 29 / 25%); }.hanzi-parent h2 { margin: 0; font-family: "STSong", serif; font-size: 34px; font-weight: 500; }.hanzi-parent > p:not(.eyebrow) { color: #827968; font-size: 13px; }.modal-close { position: absolute; top: 14px; right: 17px; border: 0; background: transparent; font-size: 27px; cursor: pointer; }.parent-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }.parent-form label { display: grid; gap: 4px; color: #756f61; font-size: 11px; }.parent-form label:first-child, .parent-form .primary-button { grid-column: 1 / -1; }.parent-form input { min-width: 0; border: 1px solid #d8cbaa; border-radius: 9px; padding: 9px; background: #fff; }.parent-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }.parent-tools button, .import-button { border: 1px solid #c7bfa9; border-radius: 9px; padding: 7px 10px; background: transparent; color: #756f61; cursor: pointer; font-size: 11px; }.import-button input { display: none; }.parent-error { color: #bd4d42 !important; }.custom-list { margin: 18px 0 0; padding: 0; list-style: none; }.custom-list li { display: flex; justify-content: space-between; border-bottom: 1px solid #eee4cc; padding: 8px 0; }.custom-list button { border: 0; background: transparent; color: #b4553d; cursor: pointer; }
 @keyframes hanzi-bloom { 50% { transform: scale(1.06) rotate(-2deg); } }.hanzi-board.is-wrong { animation: hanzi-shake .35s ease; } @keyframes hanzi-shake { 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
 .mini-hanzi { position: relative; display: block; height: 100%; min-height: 170px; overflow: hidden; border-radius: 14px; background: linear-gradient(145deg, #fff1b9, #cde9d0); }.mini-hanzi img { display: block; width: 100%; height: 100%; min-height: 170px; border-radius: inherit; object-fit: cover; object-position: center; }
-@media (max-width: 760px) { .hanzi-shell { padding: 16px 14px; }.hanzi-nav-title { position: static; transform: none; order: -1; }.hanzi-nav { gap: 10px; }.hanzi-nav .nav-actions a { display: none; }.hanzi-stage { display: block; min-height: 0; padding: 32px 0 28px; }.hanzi-intro { text-align: center; }.hanzi-intro h1 { font-size: 53px; }.hanzi-intro > p:last-of-type { margin: 15px auto; }.hanzi-mode-picker { grid-template-columns: repeat(3, 1fr); max-width: none; margin-top: 20px; }.hanzi-mode-picker button { display: block; padding: 8px 5px; text-align: center; font-size: 13px; }.hanzi-mode-picker small { display: block; margin-top: 3px; font-size: 8px; }.hanzi-board { margin-top: 25px; padding: 17px 13px 22px; }.hanzi-options { gap: 7px; }.hanzi-option { min-height: 68px; }.hanzi-footer { font-size: 10px; }.parent-form { grid-template-columns: 1fr; }.parent-form label:first-child, .parent-form .primary-button { grid-column: auto; } }
+@media (max-width: 760px) { .hanzi-shell { padding: 16px 14px max(16px, env(safe-area-inset-bottom)); }.hanzi-nav-title { position: static; transform: none; order: -1; }.hanzi-nav { gap: 10px; }.hanzi-nav .nav-actions a { display: none; }.hanzi-stage { display: block; min-height: 0; padding: 32px 0 28px; }.hanzi-intro { text-align: center; }.hanzi-intro h1 { font-size: 53px; }.hanzi-intro > p:last-of-type { margin: 15px auto; }.hanzi-mode-picker { grid-template-columns: repeat(3, 1fr); max-width: none; margin-top: 20px; }.hanzi-mode-picker button { display: block; padding: 8px 5px; text-align: center; font-size: 13px; }.hanzi-mode-picker small { display: block; margin-top: 3px; font-size: 8px; }.hanzi-board { margin-top: 25px; padding: 17px 13px 22px; }.hanzi-options { gap: 7px; }.hanzi-option { min-height: 68px; }.hanzi-footer { font-size: 10px; }.parent-form { grid-template-columns: 1fr; }.parent-form label:first-child, .parent-form .primary-button { grid-column: auto; } }
 @media (prefers-reduced-motion: reduce) { .hanzi-option, .hanzi-board.is-wrong { animation: none; transition: none; } }
+
+@media (max-width: 900px) {
+  .hanzi-shell {
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+
+  .hanzi-stage {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hanzi-board {
+    order: -1;
+  }
+
+  .hanzi-intro {
+    order: 1;
+  }
+
+  .hanzi-intro h1 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 760px) {
+  .hanzi-stage {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hanzi-board {
+    order: -1;
+    margin-top: 0;
+  }
+
+  .hanzi-intro {
+    order: 1;
+  }
+
+  .hanzi-intro h1 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    white-space: nowrap;
+  }
+}
 .parent-notice { margin: 12px 0 0; font-size: 13px; }.parent-success { color: #3f8069 !important; }
 .hanzi-parent input:focus-visible, .hanzi-parent button:focus-visible, .hanzi-parent .import-button:focus-within { outline: 3px solid rgb(180 85 61 / 45%); outline-offset: 3px; }
 .hanzi-parent select { min-width: 0; border: 1px solid #d8cbaa; border-radius: 9px; padding: 9px; background: #fff; color: inherit; }.hanzi-parent select:focus-visible { outline: 3px solid rgb(180 85 61 / 45%); outline-offset: 3px; }
@@ -348,6 +409,8 @@ a:focus-visible {
 }
 
 .board-wrap {
+  box-sizing: border-box;
+  max-width: 100%;
   padding: 13px;
   border: 1px solid rgb(23 35 31 / 13%);
   background: rgb(255 253 248 / 58%);
@@ -355,6 +418,7 @@ a:focus-visible {
 }
 
 .sudoku-board {
+  box-sizing: border-box;
   display: grid;
   overflow: hidden;
   width: 100%;
@@ -674,6 +738,17 @@ footer {
 }
 
 @media (max-width: 900px) {
+  .app-shell,
+  .merge-shell,
+  .sky-shell,
+  .twilight-shell,
+  .maze-shell,
+  .crossword-shell,
+  .dice-shell,
+  .hanzi-shell {
+    padding-bottom: max(18px, calc(env(safe-area-inset-bottom) + 12px));
+  }
+
   .app-shell {
     width: min(680px, calc(100% - 32px));
   }
@@ -682,6 +757,43 @@ footer {
     grid-template-columns: 1fr;
     gap: 28px;
     padding: 34px 0 28px;
+  }
+
+  /* On narrow screens, put the playable surface before its supporting copy. */
+  .game-layout .game-panel,
+  .merge-layout .merge-game,
+  .sky-layout .sky-game-frame,
+  .twilight-layout .twilight-game-column,
+  .maze-layout .maze-game,
+  .dice-layout .dice-table {
+    order: -1;
+  }
+
+  .game-layout .game-copy,
+  .merge-layout .merge-copy,
+  .sky-layout .sky-copy,
+  .twilight-layout .twilight-copy,
+  .maze-layout .maze-copy,
+  .dice-layout .dice-copy {
+    order: 1;
+  }
+
+  .game-copy h1,
+  .merge-copy h1,
+  .sky-copy h1,
+  .twilight-copy h1,
+  .maze-copy h1,
+  .dice-copy h1 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    white-space: nowrap;
   }
 
   .game-copy {
@@ -716,6 +828,7 @@ footer {
   }
 
   .game-panel {
+    min-width: 0;
     max-width: 620px;
     justify-self: center;
   }
@@ -799,6 +912,7 @@ footer {
   }
 
   .board-wrap {
+    width: 100%;
     padding: 7px;
   }
 
@@ -1822,12 +1936,20 @@ footer {
 
   .merge-shell {
     width: 100%;
-    padding: 16px 14px;
+    padding: 16px 14px max(16px, env(safe-area-inset-bottom));
   }
 
   .merge-layout {
     min-height: 0;
     padding: 28px 0;
+  }
+
+  .merge-layout,
+  .sky-layout,
+  .twilight-layout,
+  .dice-layout,
+  .maze-layout {
+    gap: 18px;
   }
 
   .merge-copy,
@@ -1859,7 +1981,7 @@ footer {
   }
 
   .sky-shell {
-    padding: 14px;
+    padding: 14px 14px max(14px, env(safe-area-inset-bottom));
   }
 
   .sky-layout {
@@ -2565,7 +2687,7 @@ footer {
 
 @media (max-width: 620px) {
   .twilight-shell {
-    padding: 13px 13px 22px;
+    padding: 13px 13px max(22px, calc(env(safe-area-inset-bottom) + 10px));
   }
 
   .twilight-nav-actions button:first-child {
@@ -2588,7 +2710,8 @@ footer {
   }
 
   .twilight-layout {
-    display: block;
+    display: flex;
+    flex-direction: column;
     padding: 24px 0 0;
   }
 
@@ -3969,6 +4092,34 @@ footer {
     gap: 34px;
   }
 
+  .crossword-heading h1 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    white-space: nowrap;
+  }
+
+  .crossword-shell {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .crossword-shell > .crossword-layout {
+    order: 1;
+  }
+
+  .crossword-shell > .crossword-heading,
+  .crossword-shell > .crossword-levels,
+  .crossword-shell > .batch-print-bar {
+    order: 2;
+  }
+
   .word-list {
     width: min(100%, 620px);
     justify-self: center;
@@ -3990,7 +4141,22 @@ footer {
   .maze-shell,
   .crossword-shell {
     width: 100%;
-    padding: 16px 14px 38px;
+    padding: 16px 14px max(38px, calc(env(safe-area-inset-bottom) + 24px));
+  }
+
+  .crossword-shell {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .crossword-shell > .crossword-layout {
+    order: 1;
+  }
+
+  .crossword-shell > .crossword-heading,
+  .crossword-shell > .crossword-levels,
+  .crossword-shell > .batch-print-bar {
+    order: 2;
   }
 
   .hub-actions {
@@ -4157,7 +4323,16 @@ footer {
   }
 
   .crossword-heading h1 {
-    font-size: 37px;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    white-space: nowrap;
   }
 
   .crossword-heading > p {
@@ -4218,6 +4393,92 @@ footer {
     border-left: 0;
   }
 
+  .dice-controls button,
+  .dice-roll-button,
+  .maze-levels button,
+  .maze-pad button,
+  .crossword-levels button,
+  .batch-print-bar button,
+  .batch-print-bar select,
+  .new-game-button,
+  .tool-button,
+  .number-pad button,
+  .hanzi-mode-picker button,
+  .listen-button,
+  .sound-toggle,
+  .parent-link {
+    min-height: 44px;
+  }
+
+  .merge-copy .compact-button {
+    min-height: 44px;
+  }
+
+}
+
+@media (max-width: 360px) {
+  .number-pad {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .number-pad button {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    aspect-ratio: auto;
+    padding: 0;
+  }
+
+  .site-header {
+    gap: 6px;
+  }
+
+  .brand strong {
+    max-width: 110px;
+    overflow: hidden;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .rules-button {
+    white-space: nowrap;
+    font-size: 0;
+  }
+
+  .rules-button span {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .hanzi-nav {
+    gap: 6px;
+  }
+
+  .hanzi-nav .back-link,
+  .hanzi-nav-title strong,
+  .hanzi-nav .nav-actions {
+    white-space: nowrap;
+  }
+
+  .hanzi-nav .back-link {
+    font-size: 11px;
+  }
+
+  .hanzi-nav-title {
+    gap: 3px;
+  }
+
+  .hanzi-nav-title strong {
+    font-size: 16px;
+  }
+
+  .hanzi-nav-title small {
+    display: none;
+  }
 }
 
 @page {
