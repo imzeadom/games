@@ -46,6 +46,7 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
       "manifest.webmanifest",
     ],
     ["/tools/dice", "骰子工具｜纸上游戏厅", "manifest.webmanifest"],
+    ["/tools/counter", "长期计数器｜纸上游戏厅", "manifest.webmanifest"],
     ["/history", "历史成绩｜纸上游戏厅", "manifest.webmanifest"],
     ["/hanzi-listen", "听音找汉字｜纸上游戏厅", "manifest.webmanifest"],
     ["/privacy", "隐私说明｜纸上游戏厅", "manifest.webmanifest"],
@@ -179,7 +180,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(site, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.match(llms, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.doesNotMatch(llms, /paper-sudoku-games/);
-  assert.match(serviceWorker, /paper-arcade-v8/);
+  assert.match(serviceWorker, /paper-arcade-v9/);
   assert.match(serviceWorker, /twilight-canopy/);
   assert.match(serviceWorker, /crossword/);
   assert.match(serviceWorker, /hanzi-listen/);
@@ -280,4 +281,28 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     access(new URL("../app/robots.ts", import.meta.url)),
   ]);
   await assert.rejects(access(new URL("../app/_sites-preview", projectRoot)));
+});
+
+test("counter tool has durable owner-scoped data plumbing", async () => {
+  const [page, schema, api, detailApi, hosting, serviceWorker] = await Promise.all([
+    readFile(new URL("../app/tools/counter/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../db/schema.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/counters/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/counters/[id]/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../.openai/hosting.json", import.meta.url), "utf8"),
+    readFile(new URL("../public/sw.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(page, /充值计数/);
+  assert.match(page, /type="color"/);
+  assert.match(page, /aria-live="polite"/);
+  assert.match(page, /<PwaMenuActions \/>/);
+  assert.match(schema, /idx_counters_owner_id/);
+  assert.match(api, /httpOnly: true/);
+  assert.match(api, /ownerId/);
+  assert.match(detailApi, /MAX\(-\$\{MAX_VALUE\}/);
+  assert.match(detailApi, /请提供要修改的字段/);
+  assert.match(api, /const db = await getDb\(\)/);
+  assert.match(detailApi, /const db = await getDb\(\)/);
+  assert.match(hosting, /"d1": "DB"/);
+  assert.match(serviceWorker, /paper-arcade-v9/);
 });

@@ -1,0 +1,36 @@
+.counter-shell { width: min(1120px, calc(100% - 40px)); min-height: 100vh; margin: 0 auto; padding: 26px 0 60px; }
+.counter-heading { display: flex; align-items: end; justify-content: space-between; gap: 40px; padding: 64px 3% 36px; }
+.counter-heading h1 { margin: 0; font-family: "STSong", serif; font-size: clamp(42px, 6vw, 72px); font-weight: 500; line-height: 1.12; }
+.counter-heading > p { max-width: 330px; margin: 0 0 8px; color: var(--muted); font-size: 14px; line-height: 1.9; }
+.counter-toolbar { display: flex; gap: 10px; padding: 0 3% 20px; }
+.counter-primary, .counter-retry, .counter-secondary button, .counter-card-top button { border: 1px solid var(--strong-line); border-radius: 999px; padding: 10px 17px; background: var(--strong-line); color: var(--panel); cursor: pointer; font-size: 13px; }
+.counter-retry { background: transparent; color: var(--ink); border-color: var(--line); }
+.counter-error { margin: 0 3% 16px; color: #b33f36; font-size: 13px; }
+.counter-state, .counter-empty { margin: 28px 3%; color: var(--muted); }
+.counter-empty { display: grid; gap: 8px; border: 1px dashed var(--line); padding: 38px; text-align: center; }
+.counter-empty strong { color: var(--ink); font-family: "STSong", serif; font-size: 27px; }
+.counter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; padding: 0 3%; }
+.counter-card { border: 1px solid color-mix(in srgb, var(--counter-color) 35%, var(--line)); border-top: 5px solid var(--counter-color); border-radius: 16px; padding: 19px; background: rgb(255 253 248 / 85%); box-shadow: 0 16px 36px rgb(44 54 47 / 8%); }
+.counter-card-top { display: flex; align-items: center; gap: 8px; }
+.counter-card-top h2 { flex: 1; margin: 0; font-family: "STSong", serif; font-size: 23px; font-weight: 500; }
+.counter-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--counter-color); }
+.counter-card-top button { border: 0; padding: 4px 0; background: transparent; color: var(--muted); font-size: 11px; }
+.counter-number { overflow: hidden; padding: 28px 0 22px; color: var(--counter-color); font-size: clamp(48px, 9vw, 80px); font-variant-numeric: tabular-nums; font-weight: 700; text-align: center; }
+.counter-actions { display: grid; grid-template-columns: 1fr 1.5fr; gap: 9px; }
+.counter-actions button { min-height: 58px; border: 1px solid var(--counter-color); border-radius: 11px; background: transparent; color: var(--counter-color); cursor: pointer; font-size: 19px; font-weight: 700; touch-action: manipulation; }
+.counter-actions .counter-plus { background: var(--counter-color); color: #fff; font-size: 25px; }
+.counter-secondary { display: flex; justify-content: space-between; gap: 8px; padding-top: 15px; }
+.counter-secondary button { border: 0; padding: 5px 0; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; text-decoration: underline; }
+.counter-modal-backdrop { position: fixed; z-index: 50; inset: 0; display: grid; place-items: center; padding: 20px; background: rgb(23 35 31 / 40%); }
+.counter-dialog { position: relative; display: grid; gap: 15px; width: min(440px, 100%); padding: 30px; border-radius: 18px; background: var(--panel); }
+.counter-dialog h2 { margin: 0; font-family: "STSong", serif; font-size: 29px; font-weight: 500; }
+.counter-dialog label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; }
+.counter-dialog input { border: 1px solid var(--line); border-radius: 8px; padding: 11px; }
+.counter-dialog fieldset { margin: 0; border: 0; padding: 0; color: var(--muted); font-size: 12px; }
+.counter-colors { display: flex; gap: 10px; padding-top: 8px; }
+.counter-colors button { width: 29px; height: 29px; border: 3px solid transparent; border-radius: 50%; cursor: pointer; }
+.counter-colors button.is-selected { outline: 2px solid var(--ink); outline-offset: 2px; }
+.counter-close { position: absolute; top: 14px; right: 16px; border: 0; background: transparent; font-size: 25px; cursor: pointer; }
+.counter-shell button:focus-visible, .counter-shell input:focus-visible { outline: 3px solid rgb(180 85 61 / 45%); outline-offset: 3px; }
+@media (max-width: 680px) { .counter-shell { width: min(calc(100% - 28px), 560px); padding-top: 16px; } .counter-heading { display: block; padding: 42px 2% 25px; } .counter-heading > p { margin-top: 20px; } .counter-toolbar, .counter-grid { padding-left: 2%; padding-right: 2%; } .counter-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .counter-actions button { transition: none; } }

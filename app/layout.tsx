@@ -27,6 +27,8 @@ export const metadata: Metadata = (() => {
       "听音找汉字",
       "汉字听音识字",
       "骰子工具",
+      "长期计数器",
+      "充值计数器",
       "离线游戏",
     ],
     authors: [{ name: SITE_NAME }],

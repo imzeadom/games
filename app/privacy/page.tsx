@@ -6,7 +6,7 @@ import { PwaMenuActions } from "../pwa-register";
 
 export const metadata: Metadata = {
   title: "隐私说明｜纸上游戏厅",
-  description: "了解纸上游戏厅如何在设备本地保存游戏进度和离线资源。",
+  description: "了解纸上游戏厅如何保存游戏进度、计数器数据和离线资源。",
   alternates: { canonical: `${SITE_URL}/privacy` },
 };
 
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
         <h1>简单游戏，也保持数据简单。</h1>
         <p className="privacy-lead">
           纸上游戏厅不接入广告、行为分析、营销追踪或第三方社交组件。
-          游戏进度只保存在你当前使用的浏览器中，不会由游戏代码上传。
+          游戏进度只保存在你当前使用的浏览器中，不会由游戏代码上传；长期计数器会使用匿名技术 Cookie 关联到当前浏览器，并保存到本站的数据库。
         </p>
 
         <div className="privacy-grid">
@@ -42,6 +42,15 @@ export default function PrivacyPage() {
           </section>
           <section>
             <span>02</span>
+            <h2>长期计数器与必要 Cookie</h2>
+            <p>
+              计数器不需要注册。本站使用一个无法直接识别个人的匿名技术 Cookie
+              关联你的计数器，并将数据保存在数据库中。清除浏览器网站数据会失去这台浏览器的访问关联，
+              但不会删除服务器上的计数器记录；如需删除，请在计数器工具中逐项删除。
+            </p>
+          </section>
+          <section>
+            <span>03</span>
             <h2>Cookie 与登录</h2>
             <p>
               游戏本身不设置分析或广告 Cookie。托管平台可能使用维持登录和安全所必需的
@@ -49,7 +58,7 @@ export default function PrivacyPage() {
             </p>
           </section>
           <section>
-            <span>03</span>
+            <span>04</span>
             <h2>你的控制权</h2>
             <p>
               你可以使用下方按钮清除游戏保存和离线缓存，也可以通过浏览器的网站数据设置进行管理。
@@ -61,7 +70,7 @@ export default function PrivacyPage() {
         <PrivacyActions />
         <p className="privacy-note">
           本说明适用于本站游戏代码。托管平台账户与身份验证由平台独立提供并受其条款约束。
-          最后更新：2026 年 7 月 27 日。
+          最后更新：2026 年 8 月 18 日。
         </p>
       </article>
     </main>

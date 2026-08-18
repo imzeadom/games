@@ -262,6 +262,17 @@ export default function GamesHome() {
           </div>
           <b aria-hidden="true">↗</b>
         </Link>
+        <Link className="tool-card counter-tool-card" href="/tools/counter">
+          <div className="tool-card-icon counter-tool-icon" aria-hidden="true">
+            <span>＋</span>
+          </div>
+          <div>
+            <span>02 · 长期记录</span>
+            <h3>计数器</h3>
+            <p>支持多组计数、充值与自定义颜色，数据云端保存。</p>
+          </div>
+          <b aria-hidden="true">↗</b>
+        </Link>
       </section>
 
       <footer className="hub-footer">
