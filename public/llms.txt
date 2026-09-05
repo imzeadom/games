@@ -13,6 +13,7 @@ Canonical URL: https://games.imzeadom.chatgpt.site/
 - [纸上迷宫](https://games.imzeadom.chatgpt.site/maze): 随机生成且保证可解的迷宫，包含简单、中等、困难三档。
 - [Crossword 单词寻踪](https://games.imzeadom.chatgpt.site/crossword): 在交叉字母中寻找英文单词，并通过中文释义和简单例句学习词汇。
 - [听音找汉字](https://games.imzeadom.chatgpt.site/hanzi-listen): 听普通话读音，在 500 个常用汉字中找出正确答案，也支持家长自定义字库。
+- [方块星阵](https://games.imzeadom.chatgpt.site/block-puzzle): 拖放三组拼块，填满横行或竖列触发消除，包含连消、清空奖励与救援重抽。
 
 ## Tools
 

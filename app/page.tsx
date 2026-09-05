@@ -2,6 +2,44 @@ import Link from "next/link";
 import { PwaMenuActions } from "./pwa-register";
 import { SITE_NAME, SITE_URL } from "./site";
 
+const BLOCK_PREVIEW_COLORS: Record<number, number> = {
+  0: 5,
+  1: 5,
+  2: 5,
+  8: 4,
+  10: 2,
+  11: 2,
+  12: 2,
+  16: 4,
+  18: 6,
+  20: 1,
+  24: 4,
+  25: 4,
+  26: 4,
+  28: 1,
+  29: 1,
+  30: 1,
+  31: 1,
+  34: 3,
+  36: 6,
+  37: 6,
+  39: 2,
+  42: 3,
+  44: 6,
+  47: 2,
+  48: 5,
+  49: 5,
+  50: 3,
+  52: 6,
+  55: 2,
+  56: 5,
+  58: 3,
+  59: 3,
+  60: 3,
+  61: 3,
+  62: 3,
+};
+
 const games = [
   {
     href: "/sudoku",
@@ -136,6 +174,30 @@ const games = [
       </div>
     ),
   },
+  {
+    href: "/block-puzzle",
+    number: "08",
+    title: "方块星阵",
+    description: "拖放三组拼块，填满横行或竖列，在连消中留住空间。",
+    action: "点亮星阵",
+    className: "block-puzzle-card",
+    preview: (
+      <div className="mini-block-puzzle" aria-hidden="true">
+        {Array.from({ length: 64 }, (_, index) => {
+          return (
+            <span
+              className={
+                BLOCK_PREVIEW_COLORS[index]
+                  ? `is-filled mini-block-color-${BLOCK_PREVIEW_COLORS[index]}`
+                  : undefined
+              }
+              key={index}
+            />
+          );
+        })}
+      </div>
+    ),
+  },
 ];
 
 export default function GamesHome() {
@@ -199,7 +261,7 @@ export default function GamesHome() {
         <div className="hub-actions">
           <Link href="/history">历史成绩</Link>
           <PwaMenuActions />
-          <span className="hub-count">七款小游戏 · 随时开局</span>
+          <span className="hub-count">八款小游戏 · 随时开局</span>
         </div>
       </header>
 
@@ -213,7 +275,7 @@ export default function GamesHome() {
           </h1>
         </div>
         <p>
-          七款轻量小游戏，不用注册进度也会留在当前设备。支持离线游玩，
+          八款轻量小游戏，不用注册进度也会留在当前设备。支持离线游玩，
           也可以分别安装到手机主屏幕。
         </p>
       </section>

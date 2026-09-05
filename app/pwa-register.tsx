@@ -31,6 +31,10 @@ const MANIFESTS = {
     href: "/manifest-sudoku.webmanifest",
     label: "安装数独",
   },
+  "/block-puzzle": {
+    href: "/manifest-block-puzzle.webmanifest",
+    label: "安装方块星阵",
+  },
 };
 
 type RefreshState = "idle" | "checking" | "updating";

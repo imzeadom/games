@@ -30,7 +30,7 @@ async function render(pathname = "/") {
 
 test("server-renders the game hub and route-specific PWA metadata", async () => {
   const routes = [
-    ["/", "纸上游戏厅｜七款轻松小游戏与实用工具", "manifest.webmanifest"],
+    ["/", "纸上游戏厅｜八款轻松小游戏与实用工具", "manifest.webmanifest"],
     ["/sudoku", "纸上数独｜纸上游戏厅", "manifest-sudoku.webmanifest"],
     ["/1024", "合成 1024｜纸上游戏厅", "manifest-1024.webmanifest"],
     ["/sky-hop", "云雀跃｜纸上游戏厅", "manifest-sky-hop.webmanifest"],
@@ -49,6 +49,11 @@ test("server-renders the game hub and route-specific PWA metadata", async () => 
     ["/tools/counter", "长期计数器｜纸上游戏厅", "manifest.webmanifest"],
     ["/history", "历史成绩｜纸上游戏厅", "manifest.webmanifest"],
     ["/hanzi-listen", "听音找汉字｜纸上游戏厅", "manifest.webmanifest"],
+    [
+      "/block-puzzle",
+      "方块星阵｜纸上游戏厅",
+      "manifest-block-puzzle.webmanifest",
+    ],
     ["/privacy", "隐私说明｜纸上游戏厅", "manifest.webmanifest"],
   ];
 
@@ -75,6 +80,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     skyHop,
     twilight,
     privacy,
+    privacyActions,
     site,
     llms,
     styles,
@@ -88,6 +94,8 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     vocabulary,
     otherVocabulary,
     pwaRegister,
+    blockPuzzle,
+    blockPuzzleLogic,
   ] =
     await Promise.all([
       readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
@@ -99,6 +107,10 @@ test("ships animated games, original art, privacy, and discovery assets", async 
         "utf8",
       ),
       readFile(new URL("../app/privacy/page.tsx", import.meta.url), "utf8"),
+      readFile(
+        new URL("../app/privacy/privacy-actions.tsx", import.meta.url),
+        "utf8",
+      ),
       readFile(new URL("../app/site.ts", import.meta.url), "utf8"),
       readFile(new URL("../public/llms.txt", import.meta.url), "utf8"),
       readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
@@ -121,6 +133,8 @@ test("ships animated games, original art, privacy, and discovery assets", async 
         "utf8",
       ),
       readFile(new URL("../app/pwa-register.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/block-puzzle/page.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/block-puzzle/logic.ts", import.meta.url), "utf8"),
     ]);
 
   assert.match(hub, /纸上数独/);
@@ -131,6 +145,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(hub, /Crossword · 单词寻踪/);
   assert.match(hub, /掷骰子/);
   assert.match(hub, /听音找汉字/);
+  assert.match(hub, /方块星阵/);
   assert.match(hanzi, /SpeechSynthesisUtterance/);
   assert.match(hanzi, /家长字库/);
   assert.match(hanzi, /<PwaMenuActions \/>/);
@@ -177,13 +192,15 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(twilight, /const deadZone = 1\.2/);
   assert.match(twilight, /gamma \/ 12/);
   assert.match(privacy, /不接入广告、行为分析、营销追踪/);
+  assert.match(privacyActions, /paper-arcade-block-puzzle-v1/);
   assert.match(site, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.match(llms, /https:\/\/games\.imzeadom\.chatgpt\.site/);
   assert.doesNotMatch(llms, /paper-sudoku-games/);
-  assert.match(serviceWorker, /paper-arcade-v9/);
+  assert.match(serviceWorker, /paper-arcade-v10/);
   assert.match(serviceWorker, /twilight-canopy/);
   assert.match(serviceWorker, /crossword/);
   assert.match(serviceWorker, /hanzi-listen/);
+  assert.match(serviceWorker, /block-puzzle/);
   assert.match(serviceWorker, /SKIP_WAITING/);
   assert.match(serviceWorker, /ASSET_REFERENCE_PATTERN/);
   assert.match(serviceWorker, /precacheApp/);
@@ -211,6 +228,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     dice,
     history,
     hanzi,
+    blockPuzzle,
   ]) {
     assert.match(page, /<PwaMenuActions \/>/);
   }
@@ -268,6 +286,13 @@ test("ships animated games, original art, privacy, and discovery assets", async 
   assert.match(styles, /\.die\.is-d6 span/);
   assert.doesNotMatch(sudoku, /留在这一局查看棋盘/);
   assert.match(history, /getScoreHistory/);
+  assert.match(blockPuzzle, /onPointerDown/);
+  assert.match(blockPuzzle, /requestFullscreen/);
+  assert.match(blockPuzzle, /救援重抽/);
+  assert.match(blockPuzzle, /aria-live="polite"/);
+  assert.match(blockPuzzleLogic, /placeAndClear/);
+  assert.match(blockPuzzleLogic, /completedRows/);
+  assert.match(blockPuzzleLogic, /completedColumns/);
 
   await Promise.all([
     access(new URL("../public/icon-1024-192.png", import.meta.url)),
@@ -277,6 +302,7 @@ test("ships animated games, original art, privacy, and discovery assets", async 
     access(new URL("../public/og.png", import.meta.url)),
     access(new URL("../public/favicon.ico", import.meta.url)),
     access(new URL("../public/llms.txt", import.meta.url)),
+    access(new URL("../public/manifest-block-puzzle.webmanifest", import.meta.url)),
     access(new URL("../app/sitemap.ts", import.meta.url)),
     access(new URL("../app/robots.ts", import.meta.url)),
   ]);
@@ -304,5 +330,5 @@ test("counter tool has durable owner-scoped data plumbing", async () => {
   assert.match(api, /const db = await getDb\(\)/);
   assert.match(detailApi, /const db = await getDb\(\)/);
   assert.match(hosting, /"d1": "DB"/);
-  assert.match(serviceWorker, /paper-arcade-v9/);
+  assert.match(serviceWorker, /paper-arcade-v10/);
 });

@@ -6,6 +6,7 @@ const GAME_STORAGE_KEYS = [
   "paper-sudoku-current-game",
   "paper-arcade-1024",
   "paper-arcade-sky-hop-best",
+  "paper-arcade-block-puzzle-v1",
 ];
 
 export function PrivacyActions() {

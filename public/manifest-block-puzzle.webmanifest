@@ -1,0 +1,26 @@
+{
+  "name": "方块星阵",
+  "short_name": "方块星阵",
+  "description": "拖放拼块，填满横行或竖列并触发连消。",
+  "start_url": "/block-puzzle",
+  "scope": "/",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "background_color": "#0d1430",
+  "theme_color": "#111a38",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

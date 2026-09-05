@@ -1,5 +1,5 @@
-const CACHE_NAME = "paper-arcade-v9";
-// Previous cache identifier: paper-arcade-v8. Upgrade removes older caches below.
+const CACHE_NAME = "paper-arcade-v10";
+// Previous cache identifier: paper-arcade-v9. Upgrade removes older caches below.
 const ASSET_REFERENCE_PATTERN =
   /(?:\/assets\/|assets\/|\.\.?\/)[A-Za-z0-9_./-]+\.(?:css|js|woff2?)/g;
 const APP_SHELL = [
@@ -11,6 +11,7 @@ const APP_SHELL = [
   "/maze",
   "/crossword",
   "/hanzi-listen",
+  "/block-puzzle",
   "/tools/dice",
   "/tools/counter",
   "/history",
@@ -20,6 +21,7 @@ const APP_SHELL = [
   "/manifest-1024.webmanifest",
   "/manifest-sky-hop.webmanifest",
   "/manifest-twilight.webmanifest",
+  "/manifest-block-puzzle.webmanifest",
   "/icon-192.png",
   "/icon-512.png",
   "/icon-1024-192.png",

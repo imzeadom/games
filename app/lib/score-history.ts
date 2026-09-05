@@ -5,7 +5,8 @@ export type GameId =
   | "twilight-canopy"
   | "maze"
   | "crossword"
-  | "hanzi-listen";
+  | "hanzi-listen"
+  | "block-puzzle";
 
 export type ScoreEntry = {
   id: string;
