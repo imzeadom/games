@@ -259,6 +259,73 @@
   place-items: center;
 }
 
+.block-clear-preview {
+  position: absolute;
+  z-index: 7;
+  top: -4px;
+  left: 50%;
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  border: 1px solid rgb(127 234 245 / 42%);
+  border-radius: 12px;
+  padding: 5px 12px;
+  background: rgb(14 27 66 / 88%);
+  box-shadow: 0 0 22px rgb(87 228 244 / 22%);
+  color: #bffaff;
+  font-size: 11px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.block-clear-preview strong { color: #fff; font-size: 13px; }
+
+.block-clear-burst-overlay {
+  position: absolute;
+  z-index: 9;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.block-clear-burst-overlay strong {
+  color: #fff4ae;
+  font-size: clamp(16px, 4vw, 24px);
+  text-shadow: 0 0 18px rgb(255 213 69 / 85%);
+  white-space: nowrap;
+  animation: block-burst-title 520ms ease-out both;
+}
+
+.block-impact-ring {
+  position: absolute;
+  width: clamp(100px, 30vw, 210px);
+  aspect-ratio: 1;
+  border: 3px solid #bdfaff;
+  border-radius: 50%;
+  box-shadow: 0 0 18px #70edff, inset 0 0 22px rgb(255 235 119 / 70%);
+  animation: block-impact-ring 520ms cubic-bezier(.1,.7,.2,1) both;
+}
+
+.block-impact-particles { position: absolute; width: 10px; height: 10px; }
+.block-impact-particles i {
+  position: absolute;
+  width: 7px;
+  height: 16px;
+  border-radius: 4px;
+  background: #fff19a;
+  box-shadow: 0 0 10px #7beeff;
+  transform: rotate(var(--particle-angle)) translateY(15px);
+  animation: block-impact-particle 520ms ease-out both;
+}
+.block-clear-burst-overlay.is-massive .block-impact-ring { width: clamp(150px, 45vw, 300px); border-width: 4px; }
+
+@keyframes block-impact-ring { 0% { opacity: 0; transform: scale(.2); } 25% { opacity: 1; } 100% { opacity: 0; transform: scale(1.35); } }
+@keyframes block-impact-particle { 0% { opacity: 0; transform: rotate(var(--particle-angle)) translateY(0) scale(.4); } 25% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--particle-angle)) translateY(clamp(70px, 22vw, 150px)) scale(1); } }
+@keyframes block-burst-title { 0% { opacity: 0; transform: scale(.7); } 22% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0; transform: scale(1); } }
+
 .block-board {
   --board-gap: clamp(3px, 0.55vw, 5px);
   position: relative;
@@ -376,6 +443,28 @@
   box-shadow: inset 0 0 0 2px rgb(72 7 28 / 28%);
 }
 
+.block-grid-cell.is-preview-row,
+.block-grid-cell.is-preview-column {
+  background: rgb(112 231 244 / 13%);
+  box-shadow: inset 0 0 0 1px rgb(126 239 250 / 36%), 0 0 12px rgb(79 215 239 / 16%);
+}
+
+.block-grid-cell.is-preview-row::before,
+.block-grid-cell.is-preview-column::before {
+  position: absolute;
+  z-index: 1;
+  inset: -2px;
+  border: 1px solid rgb(151 246 255 / 56%);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+  animation: block-line-preview 720ms ease-in-out infinite;
+}
+
+@keyframes block-line-preview {
+  50% { opacity: 0.35; box-shadow: 0 0 13px rgb(107 239 255 / 70%); }
+}
+
 .block-grid-cell.is-clearing > span {
   border-color: #fff;
   background: #fff;
@@ -383,6 +472,23 @@
     0 0 14px #fff,
     0 0 28px #79eaff;
   animation: block-clear 360ms ease-out both;
+}
+
+.block-stage.is-clear-burst-2 .block-grid-cell.is-clearing > span {
+  animation-duration: 430ms;
+  animation-name: block-clear-burst;
+}
+
+.block-stage.is-clear-burst-3 .block-grid-cell.is-clearing > span {
+  animation-duration: 520ms;
+  animation-name: block-clear-burst;
+  box-shadow: 0 0 18px #fff, 0 0 38px #79eaff, 0 0 62px rgb(255 218 83 / 72%);
+}
+
+@keyframes block-clear-burst {
+  0% { opacity: 1; transform: scale(.82) rotate(-4deg); filter: brightness(1.2); }
+  38% { opacity: 1; transform: scale(1.22) rotate(5deg); filter: brightness(1.7); }
+  100% { opacity: 0; transform: scale(.18) rotate(18deg); filter: brightness(2); }
 }
 
 @keyframes block-clear {
@@ -538,7 +644,8 @@
   z-index: 90;
   pointer-events: none;
   filter: drop-shadow(0 13px 16px rgb(0 0 0 / 34%));
-  will-change: top, left;
+  will-change: transform, top, left;
+  transition: filter 120ms ease, opacity 120ms ease;
 }
 
 .block-drag-piece .block-piece-shape i.is-filled {
@@ -554,6 +661,60 @@
 .block-drag-piece.is-invalid {
   opacity: 0.72;
   filter: grayscale(0.42) drop-shadow(0 11px 14px rgb(0 0 0 / 30%));
+}
+
+.block-level-up {
+  position: fixed;
+  z-index: 110;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  width: min(86vw, 360px);
+  padding: 18px 24px;
+  border: 1px solid rgb(255 236 126 / 72%);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgb(42 45 116 / 96%), rgb(18 25 68 / 96%));
+  box-shadow: 0 0 0 7px rgb(255 231 104 / 9%), 0 0 60px rgb(102 224 255 / 44%);
+  color: #fff;
+  text-align: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: block-level-up 1550ms cubic-bezier(.18,.8,.24,1) both;
+}
+
+.block-level-up::before {
+  position: absolute;
+  inset: -18px;
+  border: 1px solid rgb(141 242 255 / 62%);
+  border-radius: 30px;
+  content: "";
+  pointer-events: none;
+  animation: block-level-ring 1550ms ease-out both;
+}
+
+.block-level-up-kicker { color: #aaf6ff; font-size: 12px; letter-spacing: .22em; }
+.block-level-up strong { color: #fff3a5; font-size: clamp(28px, 9vw, 46px); letter-spacing: .08em; text-shadow: 0 0 22px rgb(255 218 83 / 80%); }
+.block-level-up > span:last-child { color: #d8e5ff; font-size: 14px; }
+
+@keyframes block-level-up {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.55) rotate(-3deg); }
+  16% { opacity: 1; transform: translate(-50%, -50%) scale(1.06) rotate(1deg); }
+  28%, 72% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.15); }
+}
+@keyframes block-level-ring { 0% { opacity: 0; transform: scale(.72); } 20% { opacity: 1; } 100% { opacity: 0; transform: scale(1.12); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .block-grid-cell.is-clearing > span,
+  .block-grid-cell.is-preview-row::before,
+  .block-grid-cell.is-preview-column::before,
+  .block-level-up,
+  .block-level-up::before,
+  .block-clear-burst-overlay strong,
+  .block-impact-ring,
+  .block-impact-particles i { animation: none; }
 }
 
 .block-modal-backdrop {

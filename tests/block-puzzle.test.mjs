@@ -37,6 +37,7 @@ test("clears a completed row after committing the piece", () => {
   for (let column = 0; column < BOARD_SIZE - 1; column += 1) {
     board[column] = 2;
   }
+  const snapshot = [...board];
 
   const result = placeAndClear(board, piece("dot", 5), 0, BOARD_SIZE - 1);
   assert.ok(result);
@@ -44,6 +45,7 @@ test("clears a completed row after committing the piece", () => {
   assert.deepEqual(result.completedColumns, []);
   assert.equal(result.clearedCells.length, BOARD_SIZE);
   assert.ok(result.board.slice(0, BOARD_SIZE).every((cell) => cell === 0));
+  assert.deepEqual(board, snapshot);
 });
 
 test("clears intersecting row and column simultaneously and counts the crossing once", () => {
@@ -72,11 +74,14 @@ test("one placement can clear multiple rows", () => {
       board[row * BOARD_SIZE + column] = 6;
     }
   }
+  const snapshot = [...board];
 
   const result = placeAndClear(board, piece("domino-v", 1), 2, 7);
   assert.ok(result);
   assert.deepEqual(result.completedRows, [2, 3]);
+  assert.deepEqual(result.completedColumns, []);
   assert.equal(result.clearedCells.length, BOARD_SIZE * 2);
+  assert.deepEqual(board, snapshot);
 });
 
 test("move detection evaluates every legal anchor for each remaining piece", () => {

@@ -264,13 +264,17 @@ export default function BlockPuzzle() {
   const [showGameOver, setShowGameOver] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isInteractionLocked, setIsInteractionLocked] = useState(false);
+  const [clearBurst, setClearBurst] = useState(0);
+  const [levelUp, setLevelUp] = useState<{ from: number; to: number } | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
+  const dragPieceRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<DragState | null>(null);
   const activePointer = useRef<number | null>(null);
   const interactionLocked = useRef(false);
   const effectTimer = useRef<number | null>(null);
   const toastTimer = useRef<number | null>(null);
   const gameOverTimer = useRef<number | null>(null);
+  const levelUpTimer = useRef<number | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const rulesCloseRef = useRef<HTMLButtonElement>(null);
   const rulesWasOpen = useRef(false);
@@ -322,6 +326,7 @@ export default function BlockPuzzle() {
       if (effectTimer.current) window.clearTimeout(effectTimer.current);
       if (toastTimer.current) window.clearTimeout(toastTimer.current);
       if (gameOverTimer.current) window.clearTimeout(gameOverTimer.current);
+      if (levelUpTimer.current) window.clearTimeout(levelUpTimer.current);
     },
     [],
   );
@@ -413,6 +418,7 @@ export default function BlockPuzzle() {
       const score = game.score + gained;
       const lines = game.lines + lineCount;
       const level = levelForLines(lines);
+      const previousLevel = levelForLines(game.lines);
       let rescueCharge: 0 | 1 = game.rescueCharge;
       let rescueProgress = game.rescueProgress;
 
@@ -463,10 +469,19 @@ export default function BlockPuzzle() {
       setSelectedPiece(null);
       setKeyboardAnchor(null);
       setNewCells(new Set(result.placedCells));
+      if (level > previousLevel) {
+        if (levelUpTimer.current) window.clearTimeout(levelUpTimer.current);
+        setLevelUp({ from: previousLevel, to: level });
+        levelUpTimer.current = window.setTimeout(() => {
+          setLevelUp(null);
+          levelUpTimer.current = null;
+        }, 1550);
+      }
 
       if (lineCount > 0) {
         interactionLocked.current = true;
         setIsInteractionLocked(true);
+        setClearBurst(lineCount);
         setClearingCells(new Set(result.clearedCells));
         const lineWord = lineCount === 1 ? "单线" : `${lineCount} 线同消`;
         const comboWord = combo > 1 ? ` · ${combo} 连消` : "";
@@ -479,13 +494,15 @@ export default function BlockPuzzle() {
         );
         safeVibrate(lineCount > 1 ? [24, 28, 38] : 28);
         if (effectTimer.current) window.clearTimeout(effectTimer.current);
+        const clearDuration = lineCount >= 3 ? 520 : lineCount === 2 ? 430 : 360;
         effectTimer.current = window.setTimeout(() => {
           interactionLocked.current = false;
           setIsInteractionLocked(false);
           setClearingCells(new Set());
           setNewCells(new Set());
+          setClearBurst(0);
           effectTimer.current = null;
-        }, 360);
+        }, clearDuration);
       } else {
         setNewCells(new Set(result.placedCells));
         if (effectTimer.current) window.clearTimeout(effectTimer.current);
@@ -565,11 +582,6 @@ export default function BlockPuzzle() {
         : clientY - pieceHeight - Math.max(42, cellSize * 0.95);
       const column = Math.round((freeLeft - originX) / step);
       const row = Math.round((freeTop - originY) / step);
-      const nearBoard =
-        column > -bounds.columns - 1 &&
-        column < BOARD_SIZE + 1 &&
-        row > -bounds.rows - 1 &&
-        row < BOARD_SIZE + 1;
       const valid = canPlacePiece(game.board, piece, row, column);
 
       return {
@@ -578,8 +590,8 @@ export default function BlockPuzzle() {
         row,
         column,
         valid,
-        left: nearBoard ? originX + column * step : freeLeft,
-        top: nearBoard ? originY + row * step : freeTop,
+        left: freeLeft,
+        top: freeTop,
         cellSize,
         gap,
         startX,
@@ -636,7 +648,17 @@ export default function BlockPuzzle() {
       current.wasSelected,
     );
     dragRef.current = next;
-    setDrag(next);
+    if (
+      next && current.row === next.row && current.column === next.column &&
+      current.valid === next.valid
+    ) {
+      if (dragPieceRef.current) {
+        dragPieceRef.current.style.left = `${next.left}px`;
+        dragPieceRef.current.style.top = `${next.top}px`;
+      }
+    } else {
+      setDrag(next);
+    }
   };
 
   const endDrag = (event: ReactPointerEvent<HTMLButtonElement>) => {
@@ -786,10 +808,23 @@ export default function BlockPuzzle() {
     }
     return cells;
   }, [activeAnchor, selected]);
+  const previewClear = useMemo(() => {
+    if (!game || !selected || !activeAnchor?.valid) return null;
+    return placeAndClear(game.board, selected, activeAnchor.row, activeAnchor.column);
+  }, [activeAnchor, game, selected]);
+  const previewRows = useMemo(
+    () => new Set(previewClear?.completedRows ?? []),
+    [previewClear],
+  );
+  const previewColumns = useMemo(
+    () => new Set(previewClear?.completedColumns ?? []),
+    [previewClear],
+  );
 
   const restart = () => {
     if (effectTimer.current) window.clearTimeout(effectTimer.current);
     if (gameOverTimer.current) window.clearTimeout(gameOverTimer.current);
+    if (levelUpTimer.current) window.clearTimeout(levelUpTimer.current);
     interactionLocked.current = false;
     setIsInteractionLocked(false);
     cancelDrag();
@@ -798,10 +833,12 @@ export default function BlockPuzzle() {
     setKeyboardAnchor(null);
     setClearingCells(new Set());
     setNewCells(new Set());
+    setClearBurst(0);
     setToast(null);
     setAnnouncement("新一局已经开始。");
     setShowRules(false);
     setShowGameOver(false);
+    setLevelUp(null);
   };
 
   const toggleFullscreen = async () => {
@@ -896,7 +933,7 @@ export default function BlockPuzzle() {
       </div>
 
       <section
-        className="block-stage"
+        className={`block-stage ${clearBurst >= 3 ? "is-clear-burst-3" : clearBurst === 2 ? "is-clear-burst-2" : ""}`}
         aria-label="方块星阵棋盘"
         aria-hidden={showRules || showGameOver}
         inert={showRules || showGameOver ? true : undefined}
@@ -904,6 +941,23 @@ export default function BlockPuzzle() {
         {toast && (
           <div className={`block-toast is-${toast.tone}`} role="status">
             {toast.text}
+          </div>
+        )}
+        {previewClear && (previewClear.completedRows.length > 0 || previewClear.completedColumns.length > 0) && (
+          <div className="block-clear-preview" role="status">
+            <span>即将消除</span>
+            <strong>{previewClear.completedRows.length} 行 · {previewClear.completedColumns.length} 列</strong>
+          </div>
+        )}
+        {clearBurst >= 2 && (
+          <div className={`block-clear-burst-overlay ${clearBurst >= 3 ? "is-massive" : ""}`} aria-hidden="true">
+            <span className="block-impact-ring" />
+            <strong>大爆发 · {clearBurst} 线同消</strong>
+            <div className="block-impact-particles">
+              {Array.from({ length: clearBurst >= 3 ? 24 : 12 }, (_, index) => (
+                <i key={index} style={{ "--particle-angle": `${index * (360 / (clearBurst >= 3 ? 24 : 12))}deg` } as CSSProperties} />
+              ))}
+            </div>
           </div>
         )}
         <div
@@ -930,6 +984,8 @@ export default function BlockPuzzle() {
               preview === false ? "is-invalid" : "",
               isAnchor && !activeAnchor ? "is-legal-anchor" : "",
               clearingCells.has(index) ? "is-clearing" : "",
+              previewRows.has(row) ? "is-preview-row" : "",
+              previewColumns.has(column) ? "is-preview-column" : "",
               newCells.has(index) && !clearingCells.has(index) ? "is-new" : "",
             ]
               .filter(Boolean)
@@ -1004,6 +1060,7 @@ export default function BlockPuzzle() {
 
       {drag && game.pieces[drag.pieceIndex] && (
         <div
+          ref={dragPieceRef}
           className={`block-drag-piece ${drag.valid ? "is-valid" : "is-invalid"}`}
           style={{ left: drag.left, top: drag.top }}
         >
@@ -1012,6 +1069,14 @@ export default function BlockPuzzle() {
             cellSize={drag.cellSize}
             gap={drag.gap}
           />
+        </div>
+      )}
+
+      {levelUp && (
+        <div className="block-level-up" role="status" aria-live="polite">
+          <span className="block-level-up-kicker">星阵跃迁</span>
+          <strong>LEVEL UP</strong>
+          <span>Lv.{levelUp.from} → Lv.{levelUp.to} · {rankForLevel(levelUp.to)}</span>
         </div>
       )}
 
