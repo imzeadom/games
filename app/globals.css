@@ -309,7 +309,7 @@
   animation: block-impact-ring 520ms cubic-bezier(.1,.7,.2,1) both;
 }
 
-.block-impact-particles { position: absolute; width: 10px; height: 10px; }
+.block-impact-particles { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; transform: translate(-50%, -50%); }
 .block-impact-particles i {
   position: absolute;
   width: 7px;
@@ -321,6 +321,9 @@
   animation: block-impact-particle 520ms ease-out both;
 }
 .block-clear-burst-overlay.is-massive .block-impact-ring { width: clamp(150px, 45vw, 300px); border-width: 4px; }
+.block-clear-burst-overlay:not(.is-massive) .block-impact-ring,
+.block-clear-burst-overlay:not(.is-massive) .block-impact-particles i,
+.block-clear-burst-overlay:not(.is-massive) strong { animation-duration: 430ms; }
 
 @keyframes block-impact-ring { 0% { opacity: 0; transform: scale(.2); } 25% { opacity: 1; } 100% { opacity: 0; transform: scale(1.35); } }
 @keyframes block-impact-particle { 0% { opacity: 0; transform: rotate(var(--particle-angle)) translateY(0) scale(.4); } 25% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--particle-angle)) translateY(clamp(70px, 22vw, 150px)) scale(1); } }
