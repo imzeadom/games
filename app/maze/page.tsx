@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { formatDuration, recordScore } from "../lib/score-history";
+import { findMazeRoute, mazeStars, placeMazeYarn } from "../lib/maze-rewards";
 import { PwaMenuActions } from "../pwa-register";
 
 type Difficulty = "easy" | "medium" | "hard";
@@ -264,6 +265,83 @@ function cellStyle(walls: number): CSSProperties {
   };
 }
 
+function CatHead() {
+  return (
+    <svg viewBox="0 0 48 42" className="cat-head" aria-hidden="true">
+      <path
+        d="M7 17 5 3l13 8q6-2 12 0L43 3l-2 15q3 5 2 11-3 11-19 11T5 29q-1-7 2-12Z"
+        fill="#f7ead8"
+        stroke="currentColor"
+        strokeWidth="2.3"
+        strokeLinejoin="round"
+      />
+      <path d="m10 9 7 5m21-5-7 5" stroke="#bc8065" strokeWidth="2" />
+      <circle cx="17" cy="23" r="2" />
+      <circle cx="31" cy="23" r="2" />
+      <path
+        d="m22 28 2 2 2-2m-2 2q-2 4-5 1m5-1q2 4 5 1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function CatMascot() {
+  return (
+    <div className="cat-mascot" aria-hidden="true">
+      <svg viewBox="0 0 180 145">
+        <path
+          d="M17 133q22-12 47-5l-3-23q-18-9-18-31L35 28q-1-11 9-5l27 22q18-9 39 0l28-22q10-6 9 5l-9 46q0 23-19 32l-2 23q23-8 44 4"
+          fill="#f6ead9"
+          stroke="#4d4238"
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
+        <path d="m49 37 18 15m65-15-18 15" stroke="#c98268" strokeWidth="5" />
+        <ellipse cx="71" cy="73" rx="4" ry="6" />
+        <ellipse cx="111" cy="73" rx="4" ry="6" />
+        <path
+          d="m87 84 4 4 4-4m-4 4q-7 10-14 2m14-2q7 10 14 2M39 78 14 72m25 14-26 3m128-11 25-6m-24 14 25 4"
+          fill="none"
+          stroke="#4d4238"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M125 108q36-13 27 8"
+          fill="none"
+          stroke="#4d4238"
+          strokeWidth="8"
+          strokeLinecap="round"
+        />
+      </svg>
+      <span>喵，帮我找小鱼！</span>
+    </div>
+  );
+}
+
+function FishIcon() {
+  return (
+    <svg viewBox="0 0 48 32" className="fish-icon" role="img" aria-label="鱼骨终点">
+      <circle cx="8" cy="16" r="5" fill="#f1dfbd" stroke="currentColor" strokeWidth="2" />
+      <circle cx="7" cy="14" r="0.8" fill="currentColor" />
+      <path d="M12 16h27m-4 0 8-9v18l-8-9M18 16l-3-7m9 7-2-8m9 8 1-7m-17 7-3 7m9-7-2 8m9-8 1 7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function YarnIcon() {
+  return (
+    <svg className="yarn-mark" viewBox="0 0 24 24" aria-label="毛线" role="img">
+      <circle cx="12" cy="12" r="8" fill="#e6b58e" stroke="#9c634c" strokeWidth="1.5" />
+      <path d="M6 9q7 2 12-1M5 13q8 3 14-1M8 18q4-4 9-6M11 4q3 5 1 16" fill="none" stroke="#9c634c" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function MazeGame() {
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const [maze, setMaze] = useState<MazeState | null>(null);
@@ -273,14 +351,36 @@ export default function MazeGame() {
   const [elapsed, setElapsed] = useState(0);
   const [won, setWon] = useState(false);
   const [showWinModal, setShowWinModal] = useState(false);
+  const [yarnCells, setYarnCells] = useState<number[]>([]);
+  const [collected, setCollected] = useState<number[]>([]);
+  const [hintCells, setHintCells] = useState<number[]>([]);
+  const [hintsLeft, setHintsLeft] = useState(3);
+  const [notice, setNotice] = useState("");
+  const noticeTimer = useRef<number | null>(null);
+  const hintTimer = useRef<number | null>(null);
+  const printingRef = useRef(false);
   const [printCount, setPrintCount] = useState(10);
   const [printMazes, setPrintMazes] = useState<MazeState[] | null>(null);
+  const [printYarns, setPrintYarns] = useState<number[][]>([]);
   const [preparingPrint, setPreparingPrint] = useState(false);
   const pointerStart = useRef<[number, number] | null>(null);
 
+  useEffect(() => () => {
+    if (noticeTimer.current) window.clearTimeout(noticeTimer.current);
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+  }, []);
+
   const startGame = useCallback((nextDifficulty: Difficulty) => {
     setDifficulty(nextDifficulty);
-    setMaze(generateMaze(DIFFICULTIES[nextDifficulty].size));
+    const nextMaze = generateMaze(DIFFICULTIES[nextDifficulty].size);
+    setMaze(nextMaze);
+    setYarnCells(placeMazeYarn(nextMaze.cells, nextMaze.size));
+    setCollected([]);
+    setHintCells([]);
+    setHintsLeft(3);
+    setNotice("");
+    if (noticeTimer.current) window.clearTimeout(noticeTimer.current);
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
     setPlayer(0);
     setTrail([0]);
     setSteps(0);
@@ -296,10 +396,9 @@ export default function MazeGame() {
 
   useEffect(() => {
     if (!maze || won) return;
-    const timer = window.setInterval(
-      () => setElapsed((current) => current + 1),
-      1000,
-    );
+    const timer = window.setInterval(() => {
+      if (!document.hidden && !printingRef.current) setElapsed((current) => current + 1);
+    }, 1000);
     return () => window.clearInterval(timer);
   }, [maze, won]);
 
@@ -311,8 +410,11 @@ export default function MazeGame() {
 
   useEffect(() => {
     const finishPrinting = () => setPrintMazes(null);
-    window.addEventListener("afterprint", finishPrinting);
-    return () => window.removeEventListener("afterprint", finishPrinting);
+    const beforePrint = () => { printingRef.current = true; };
+    const afterPrint = () => { printingRef.current = false; finishPrinting(); };
+    window.addEventListener("beforeprint", beforePrint);
+    window.addEventListener("afterprint", afterPrint);
+    return () => { window.removeEventListener("beforeprint", beforePrint); window.removeEventListener("afterprint", afterPrint); };
   }, []);
 
   const move = useCallback(
@@ -321,7 +423,15 @@ export default function MazeGame() {
       const direction = DIRECTIONS.find(
         (candidate) => candidate.name === directionName,
       );
-      if (!direction || maze.cells[player] & direction.wall) return;
+      if (!direction) return;
+      const row = Math.floor(player / maze.size);
+      const column = player % maze.size;
+      const nextRow = row + direction.row;
+      const nextColumn = column + direction.column;
+      if (
+        nextRow < 0 || nextColumn < 0 || nextRow >= maze.size ||
+        nextColumn >= maze.size || maze.cells[player] & direction.wall
+      ) return;
       const next =
         player + direction.row * maze.size + direction.column;
       const nextSteps = steps + 1;
@@ -331,7 +441,16 @@ export default function MazeGame() {
       );
       setSteps(nextSteps);
 
+      if (yarnCells.includes(next) && !collected.includes(next)) {
+        const nextCollected = [...collected, next];
+        setCollected(nextCollected);
+        setNotice(`找到一团毛线！已收集 ${nextCollected.length}/3 团`);
+        if (noticeTimer.current) window.clearTimeout(noticeTimer.current);
+        noticeTimer.current = window.setTimeout(() => setNotice(""), 2200);
+      }
+
       if (next === maze.cells.length - 1) {
+        const yarnCount = collected.length + (yarnCells.includes(next) && !collected.includes(next) ? 1 : 0);
         setWon(true);
         setShowWinModal(true);
         recordScore({
@@ -340,12 +459,12 @@ export default function MazeGame() {
           difficulty: DIFFICULTIES[difficulty].label,
           elapsed,
           moves: nextSteps,
-          detail: `${nextSteps} 步走出迷宫 · 最短 ${maze.shortestPath} 步`,
+          detail: `${nextSteps} 步 · ${formatDuration(elapsed)} · 毛线 ${yarnCount}/3 · ${mazeStars(yarnCount)} 星`,
           completed: true,
         });
       }
     },
-    [difficulty, elapsed, maze, player, steps, won],
+    [collected, difficulty, elapsed, maze, player, steps, won, yarnCells],
   );
 
   useEffect(() => {
@@ -362,12 +481,36 @@ export default function MazeGame() {
     const onKeyDown = (event: KeyboardEvent) => {
       const direction = keyDirections[event.code];
       if (!direction) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, select, textarea, [role='dialog'], [role='menu'], [aria-haspopup='menu'], .nav-actions, [contenteditable='true']")) return;
       event.preventDefault();
       move(direction);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [move]);
+
+  const useHint = () => {
+    if (!maze || won || hintCells.length || !hintsLeft) return;
+    const remaining = yarnCells.filter((cell) => !collected.includes(cell));
+    const target =
+      remaining.sort(
+        (first, second) =>
+          findMazeRoute(maze.cells, maze.size, player, first).length -
+          findMazeRoute(maze.cells, maze.size, player, second).length,
+      )[0] ?? maze.cells.length - 1;
+    setHintCells(
+      findMazeRoute(maze.cells, maze.size, player, target).slice(1, 5),
+    );
+    setHintsLeft((count) => count - 1);
+    if (noticeTimer.current) window.clearTimeout(noticeTimer.current);
+    setNotice(remaining.length ? "沿着亮起的格子，去找毛线吧！" : "沿着亮起的格子，去找小鱼吧！");
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    hintTimer.current = window.setTimeout(() => {
+      setHintCells([]);
+      setNotice("");
+    }, 3000);
+  };
 
   const completeSwipe = (x: number, y: number) => {
     if (!pointerStart.current) return;
@@ -386,11 +529,11 @@ export default function MazeGame() {
   const printBatch = () => {
     setPreparingPrint(true);
     window.setTimeout(() => {
-      setPrintMazes(
-        Array.from({ length: printCount }, () =>
-          generateMaze(DIFFICULTIES[difficulty].size),
-        ),
+      const generated = Array.from({ length: printCount }, () =>
+        generateMaze(DIFFICULTIES[difficulty].size),
       );
+      setPrintMazes(generated);
+      setPrintYarns(generated.map((item) => placeMazeYarn(item.cells, item.size)));
       setPreparingPrint(false);
     }, 0);
   };
@@ -423,15 +566,13 @@ export default function MazeGame() {
 
       <section className="maze-layout">
         <div className="maze-copy">
-          <p className="eyebrow">PAPER MAZE</p>
-          <h1>
-            绕一点远路，
-            <br />
-            也会抵达出口。
-          </h1>
+          <p className="eyebrow">MAZE GAME · 小猫的纸上冒险</p>
+          <h1>小猫寻鱼记</h1>
           <p className="intro">
-            从左上角走到右下角。每一座迷宫都随机生成，并保证能够抵达出口。
+            帮小猫从左边出发，找到右下角的小鱼！路上的 3 团毛线是额外挑战，不收集也能通关。
           </p>
+          <CatMascot />
+          <p className="maze-star-rule">到达小鱼得 1 星 · 收集 2 团毛线得 2 星 · 集齐 3 团得 3 星</p>
           <div className="maze-levels" aria-label="选择难度">
             {(Object.keys(DIFFICULTIES) as Difficulty[]).map((level) => (
               <button
@@ -473,6 +614,10 @@ export default function MazeGame() {
         </div>
 
         <div className="maze-game">
+          <div className="maze-mobile-title">
+            <strong>小猫寻鱼记</strong>
+            <span>从左边出发，找到右下角的小鱼</span>
+          </div>
           <div className="maze-status" aria-label="本局状态">
             <div>
               <span>用时</span>
@@ -483,28 +628,40 @@ export default function MazeGame() {
               <strong>{steps}</strong>
             </div>
             <div>
-              <span>最短</span>
-              <strong>{maze.shortestPath}</strong>
+              <span>毛线</span>
+              <strong>{collected.length}/3</strong>
             </div>
-            <div>
-              <span>支路深度</span>
-              <strong>{maze.branchDepth}</strong>
-            </div>
+            <button
+              onClick={useHint}
+              disabled={won || !hintsLeft || !!hintCells.length}
+              aria-label={`使用提示，还剩 ${hintsLeft} 次`}
+            >
+              提示 {hintsLeft}
+            </button>
             <button onClick={() => startGame(difficulty)}>↻ 换一座</button>
           </div>
-          <div
+          <p className="maze-live" aria-live="polite">
+            {notice || "用方向键、WASD、滑动或下方按钮移动小猫。"}
+          </p>
+          <div className="maze-paper-frame">
+            <div className="maze-paper-title">MAZE GAME</div>
+            <div
             className="maze-board"
             role="application"
             aria-label={`${DIFFICULTIES[difficulty].label}迷宫，玩家在第 ${
               Math.floor(player / maze.size) + 1
             } 行第 ${(player % maze.size) + 1} 列`}
+            tabIndex={0}
             style={{ "--maze-size": maze.size } as CSSProperties}
             onPointerDown={(event) => {
               pointerStart.current = [event.clientX, event.clientY];
               event.currentTarget.setPointerCapture(event.pointerId);
             }}
             onPointerUp={(event) => completeSwipe(event.clientX, event.clientY)}
-          >
+              onPointerCancel={() => {
+                pointerStart.current = null;
+              }}
+            >
             {maze.cells.map((walls, index) => (
               <div
                 key={index}
@@ -513,24 +670,46 @@ export default function MazeGame() {
                   index === 0 ? "maze-start" : "",
                   index === maze.cells.length - 1 ? "maze-exit" : "",
                   trail.includes(index) ? "is-trail" : "",
+                  hintCells.includes(index) ? "is-hinted" : "",
+                  yarnCells.includes(index) && !collected.includes(index)
+                    ? "has-yarn"
+                    : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                style={cellStyle(walls)}
-              >
-                {index === maze.cells.length - 1 && (
-                  <span aria-hidden="true">◎</span>
+                style={cellStyle(
+                  index === 0
+                    ? walls & ~8
+                    : index === maze.cells.length - 1
+                      ? walls & ~2
+                      : walls,
                 )}
+                data-cell-index={index}
+                data-walls={walls}
+                data-player={player === index || undefined}
+                data-pickup={
+                  yarnCells.includes(index) && !collected.includes(index)
+                    ? "yarn"
+                    : undefined
+                }
+              >
+                {yarnCells.includes(index) && !collected.includes(index) && (
+                  <YarnIcon />
+                )}
+                {index === maze.cells.length - 1 && <FishIcon />}
                 {trail.includes(index) && (
                   <i className="maze-trail-mark" aria-hidden="true" />
                 )}
               </div>
             ))}
-            <i
-              className="maze-token"
-              style={playerStyle}
-              aria-hidden="true"
-            />
+              <i className="maze-token" style={playerStyle} aria-hidden="true">
+                <CatHead />
+              </i>
+            </div>
+            <div className="maze-entry-caption">
+              <span>← 小猫出发</span>
+              <span>鱼骨终点 →</span>
+            </div>
           </div>
           <div className="maze-pad" aria-label="移动方向">
             <button aria-label="向上" onClick={() => move("up")}>
@@ -560,11 +739,11 @@ export default function MazeGame() {
               ×
             </button>
             <p className="eyebrow">找到出口</p>
-            <h2>走出来了！</h2>
-            <p>
-              用时 {formatDuration(elapsed)}，走了 {steps} 步。最佳路线是{" "}
-              {maze.shortestPath} 步。
+            <h2>小猫找到小鱼啦！</h2>
+            <p className="earned-stars" aria-label={`获得${mazeStars(collected.length)}颗星`}>
+              <span aria-hidden="true">{"★".repeat(mazeStars(collected.length))}{"☆".repeat(3 - mazeStars(collected.length))}</span>
             </p>
+            <p>收集毛线 {collected.length}/3 团 · 走了 {steps} 步 · 用时 {formatDuration(elapsed)}</p>
             <button
               className="primary-button"
               onClick={() => startGame(difficulty)}
@@ -585,7 +764,7 @@ export default function MazeGame() {
               <header className="print-sheet-heading">
                 <div>
                   <p>PAPER MAZE</p>
-                  <h1>纸上迷宫</h1>
+                  <h1>小猫寻鱼记</h1>
                 </div>
                 <span>
                   {DIFFICULTIES[difficulty].label} · {mazeIndex + 1}/
@@ -593,8 +772,13 @@ export default function MazeGame() {
                 </span>
               </header>
               <p className="print-instructions">
-                从左上角的起点出发，找到通往右下角终点的路。
+                帮小猫从左边出发找到小鱼！到达得1星，收集2团毛线得2星，集齐3团得3星。
               </p>
+              <div className="print-wayfinding">
+                <CatMascot />
+                <span aria-hidden="true">→</span>
+                <FishIcon />
+              </div>
               <div
                 className="print-maze-board"
                 style={{ "--maze-size": printMaze.size } as CSSProperties}
@@ -611,13 +795,17 @@ export default function MazeGame() {
                       .filter(Boolean)
                       .join(" ")}
                     key={cellIndex}
-                    style={cellStyle(walls)}
+                    style={cellStyle(cellIndex === 0 ? walls & ~8 : cellIndex === printMaze.cells.length - 1 ? walls & ~2 : walls)}
                   >
-                    {cellIndex === 0
-                      ? "起"
-                      : cellIndex === printMaze.cells.length - 1
-                        ? "终"
-                        : ""}
+                    {cellIndex === 0 ? (
+                      <CatHead />
+                    ) : cellIndex === printMaze.cells.length - 1 ? (
+                      <FishIcon />
+                    ) : printYarns[mazeIndex]?.includes(cellIndex) ? (
+                      <YarnIcon />
+                    ) : (
+                      ""
+                    )}
                   </span>
                 ))}
               </div>

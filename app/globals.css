@@ -5021,6 +5021,202 @@ footer {
   text-underline-offset: 3px;
 }
 
+/* Cat maze paper worksheet theme */
+.maze-shell {
+  --maze-paper: #fffdf7;
+  --maze-ink: #40382f;
+  --maze-wall: #4c433a;
+  background: #f4efe4;
+  color: var(--maze-ink);
+}
+
+.maze-layout {
+  grid-template-columns: minmax(230px, 0.62fr) minmax(420px, 1fr);
+  gap: clamp(24px, 5vw, 76px);
+  align-items: center;
+}
+
+.maze-copy h1 {
+  color: #493b31;
+  font-size: clamp(38px, 4.5vw, 58px);
+}
+
+.maze-copy .intro {
+  max-width: 380px;
+  color: #665b4e;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.maze-star-rule {
+  max-width: 370px;
+  margin: 0 0 21px;
+  color: #84634d;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.cat-mascot {
+  display: flex;
+  max-width: 340px;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 18px;
+  color: #4d4238;
+}
+
+.cat-mascot svg { width: min(40%, 130px); }
+
+.cat-mascot span {
+  align-self: flex-end;
+  margin-bottom: 13px;
+  color: #9a6a52;
+  font-family: "STSong", serif;
+  font-size: 13px;
+}
+
+.maze-game { max-width: 650px; }
+.maze-status { gap: clamp(10px, 2vw, 23px); }
+
+.maze-status div span {
+  color: #817568;
+  letter-spacing: .02em;
+  font-size: 10px;
+}
+
+.maze-status div strong { color: #443a31; }
+
+.maze-status button {
+  border: 1px solid #b9a891;
+  border-radius: 3px;
+  padding: 8px 11px;
+  color: #655243;
+  font-size: 11px;
+}
+
+.maze-status button:disabled {
+  cursor: default;
+  opacity: .45;
+}
+
+.maze-live {
+  min-height: 18px;
+  margin: 0 0 7px;
+  color: #80644f;
+  font-size: 11px;
+}
+
+.maze-paper-frame {
+  position: relative;
+  padding: 28px 18px 16px;
+  border: 2px dashed #665c50;
+  background: var(--maze-paper);
+  box-shadow: 0 14px 35px rgb(64 53 38 / 11%);
+}
+
+.maze-paper-title {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  padding: 0 12px;
+  transform: translateX(-50%);
+  background: var(--maze-paper);
+  color: #42382f;
+  font-family: ui-rounded, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+
+.maze-board {
+  --maze-wall: #4c433a;
+  border: 0;
+  outline: 0;
+  background: var(--maze-paper);
+  box-shadow: none;
+}
+
+.maze-cell { border-width: 1.2px; }
+.maze-cell.maze-start { background: #e9eee4; }
+.maze-cell.maze-exit { background: #f3e3c8; }
+.maze-cell.is-trail { background: #e7eee3; }
+
+.maze-cell.is-hinted {
+  background: #efc38f !important;
+  animation: maze-hint-pulse .7s ease-in-out infinite alternate;
+}
+
+.maze-cell.has-yarn { background: #fbf1df; }
+
+.yarn-mark {
+  width: 62%;
+  height: 62%;
+  filter: drop-shadow(0 1px 1px rgb(255 255 255 / 70%));
+}
+
+.cat-head {
+  width: 100%;
+  height: 100%;
+  color: #4d4238;
+}
+
+.maze-token {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.maze-token .cat-head {
+  overflow: visible;
+  filter: drop-shadow(0 1px 1px rgb(60 45 34 / 25%));
+}
+
+.fish-icon {
+  width: 78%;
+  height: 78%;
+  color: #564b40;
+}
+
+.maze-entry-caption {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 9px;
+  color: #86725d;
+  font-family: "STSong", serif;
+  font-size: 10px;
+}
+
+.maze-pad button { border-radius: 6px; color: #55463a; }
+
+.earned-stars {
+  color: #c48748;
+  font-size: 29px !important;
+  letter-spacing: .15em;
+}
+
+.maze-shell .earned-stars { color: #c48748; }
+
+.maze-mobile-title,
+.print-wayfinding { display: none; }
+
+@keyframes maze-hint-pulse {
+  from { background-color: #f8e5c6; }
+  to { background-color: #e7b978; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .maze-cell.is-hinted {
+    animation: none;
+  }
+
+  .maze-token {
+    transition: none;
+  }
+}
+
 /* Crossword word search */
 
 .crossword-heading {
@@ -5883,5 +6079,92 @@ footer {
   .print-word-list span {
     color: #444;
     font-size: 8pt;
+  }
+}
+
+
+@media (max-width: 760px) {
+  .maze-layout {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    gap: 18px;
+    padding: 23px 2px 28px;
+  }
+
+  .maze-copy { order: 2; }
+  .maze-game { order: 1; width: 100%; }
+  .maze-status { flex-wrap: wrap; }
+
+  .maze-mobile-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0 0 8px;
+    color: #493b31;
+  }
+
+  .maze-mobile-title strong {
+    font-family: "STSong", serif;
+    font-size: 17px;
+  }
+
+  .maze-mobile-title span {
+    color: #806f5d;
+    font-size: 10px;
+  }
+}
+
+@media print {
+  .maze-paper-frame {
+    border: 1.5px dashed #111;
+    padding: 12mm 10mm;
+    background: #fff;
+    box-shadow: none;
+  }
+
+  .maze-paper-title { background: #fff; color: #111; }
+  .maze-board { border: 0; outline: 0; background: #fff; }
+  .maze-shell .print-sheet { border: 1.5px dashed #111; padding: 10mm; }
+  .maze-shell .print-maze-board { border: 0 !important; }
+  .maze-shell .maze-paper-frame { padding: 12mm 10mm; }
+
+  .print-wayfinding {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9mm;
+    margin: 3mm 0 5mm;
+    color: #111;
+  }
+
+  .print-wayfinding .cat-mascot { width: 42mm; margin: 0; }
+
+  .print-wayfinding .cat-mascot svg {
+    width: 26mm;
+  }
+
+  .print-wayfinding .cat-mascot span {
+    color: #111;
+    font-size: 8pt;
+  }
+
+  .print-wayfinding .fish-icon { width: 23mm; height: 16mm; }
+  .print-sheet svg { filter: grayscale(1) contrast(4); }
+
+  .print-sheet svg path,
+  .print-sheet svg circle,
+  .print-sheet svg ellipse {
+    stroke: #111;
+  }
+
+  .print-sheet svg path[fill="#f7ead8"], .print-sheet svg path[fill="#f6ead9"],
+  .print-sheet svg path[fill="#f1dfbd"],
+  .print-sheet svg circle[fill="#e6b58e"] {
+    fill: #fff;
+  }
+
+  .cat-head,
+  .fish-icon {
+    color: #111;
   }
 }

@@ -119,7 +119,7 @@ const games = [
     href: "/maze",
     number: "05",
     title: "纸上迷宫",
-    description: "在随机生成的岔路中辨认方向，找到右下角的出口。",
+    description: "陪小猫穿过纸上迷宫，找到右下角的小鱼。",
     action: "走进迷宫",
     className: "maze-card",
     preview: (
