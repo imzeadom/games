@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   type CSSProperties,
   useCallback,
@@ -11,9 +12,11 @@ import {
 import { formatDuration, recordScore } from "../lib/score-history";
 import { findMazeRoute, mazeStars, placeMazeYarn } from "../lib/maze-rewards";
 import { PwaMenuActions } from "../pwa-register";
+import { moveMazePlayer } from "../lib/maze-movement";
 
 type Difficulty = "easy" | "medium" | "hard";
 type Direction = "up" | "right" | "down" | "left";
+type Story = "cat" | "rabbit";
 type MazeState = {
   size: number;
   cells: number[];
@@ -21,6 +24,10 @@ type MazeState = {
   branchDepth: number;
 };
 const PRINT_COUNTS = [1, 5, 10, 20] as const;
+const STORIES: Record<Story, { title: string; goal: string; pickup: string; buddy: string; action: string; callout: string; accent: string; description: string }> = {
+  cat: { title: "小猫寻鱼记", goal: "小鱼", pickup: "毛线", buddy: "小猫", action: "找到小鱼", callout: "喵，帮我找小鱼！", accent: "cat", description: "帮小猫从左边出发，找到右下角的小鱼！路上的 3 团毛线是额外挑战，不收集也能通关。" },
+  rabbit: { title: "小兔找胡萝卜", goal: "胡萝卜", pickup: "水滴", buddy: "小兔", action: "找到胡萝卜", callout: "带上水壶，去找胡萝卜！", accent: "rabbit", description: "小兔带着水壶出发啦！找到右下角的胡萝卜，沿路收集 3 滴水，为小菜园浇水。" },
+};
 
 const DIFFICULTIES: Record<
   Difficulty,
@@ -289,6 +296,10 @@ function CatHead() {
   );
 }
 
+function RabbitHead() {
+  return <svg viewBox="0 0 48 42" className="rabbit-head" aria-hidden="true"><path d="M12 17 8 2q-1-4 4-2l9 15q3-1 6 0l9-15q5-2 4 2l-4 16q4 5 3 12-3 10-16 10T7 29q-1-7 5-12Z" fill="#fffaf0" stroke="currentColor" strokeWidth="2.3" strokeLinejoin="round"/><path d="m12 7 7 11m17-11-7 11" stroke="#d99180" strokeWidth="2"/><circle cx="17" cy="24" r="2"/><circle cx="31" cy="24" r="2"/><path d="m22 29 2 2 2-2m-2 2q-2 3-5 1m5-1q2 3 5 1" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>;
+}
+
 function CatMascot() {
   return (
     <div className="cat-mascot" aria-hidden="true">
@@ -342,7 +353,26 @@ function YarnIcon() {
   );
 }
 
+function DewIcon() {
+  return <svg className="dew-mark" viewBox="0 0 24 24" role="img" aria-label="水滴"><path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13Z" fill="#9fc8ba" stroke="#55796b" strokeWidth="1.5"/><path d="M9 16q1 3 4 3" fill="none" stroke="#fffdf7" strokeWidth="1.4" strokeLinecap="round"/></svg>;
+}
+
+function GoalIcon({ story, small = false }: { story: Story; small?: boolean }) {
+  if (story === "rabbit") return <Image className={small ? "carrot-icon is-small" : "carrot-icon"} src="/maze/carrot.webp" alt="胡萝卜" width={small ? 32 : 64} height={small ? 32 : 64} unoptimized />;
+  return <FishIcon />;
+}
+
+function StoryPicker({ story, onSelect, variant = "desktop" }: { story: Story; onSelect: (story: Story) => void; variant?: "desktop" | "mobile" }) {
+  return (
+    <div className={`maze-story-picker ${variant === "mobile" ? "maze-story-picker--mobile" : "maze-story-picker--desktop"}`} role="group" aria-label="选择迷宫故事">
+      <button type="button" className={story === "cat" ? "is-active" : ""} aria-pressed={story === "cat"} onClick={() => onSelect("cat")}><span aria-hidden="true">🐈</span><strong>小猫找小鱼</strong><small>毛线收集挑战</small></button>
+      <button type="button" className={story === "rabbit" ? "is-active" : ""} aria-pressed={story === "rabbit"} onClick={() => onSelect("rabbit")}><Image src="/maze/rabbit.webp" alt="" width={36} height={48} unoptimized /><strong>小兔找胡萝卜</strong><small>浇水长菜园 · 蹦跳技能</small></button>
+    </div>
+  );
+}
+
 export default function MazeGame() {
+  const [story, setStory] = useState<Story>("cat");
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const [maze, setMaze] = useState<MazeState | null>(null);
   const [player, setPlayer] = useState(0);
@@ -355,6 +385,8 @@ export default function MazeGame() {
   const [collected, setCollected] = useState<number[]>([]);
   const [hintCells, setHintCells] = useState<number[]>([]);
   const [hintsLeft, setHintsLeft] = useState(3);
+  const [hopsLeft, setHopsLeft] = useState(3);
+  const [hopArmed, setHopArmed] = useState(false);
   const [notice, setNotice] = useState("");
   const noticeTimer = useRef<number | null>(null);
   const hintTimer = useRef<number | null>(null);
@@ -370,7 +402,8 @@ export default function MazeGame() {
     if (hintTimer.current) window.clearTimeout(hintTimer.current);
   }, []);
 
-  const startGame = useCallback((nextDifficulty: Difficulty) => {
+  const startGame = useCallback((nextDifficulty: Difficulty, nextStory: Story) => {
+    setStory(nextStory);
     setDifficulty(nextDifficulty);
     const nextMaze = generateMaze(DIFFICULTIES[nextDifficulty].size);
     setMaze(nextMaze);
@@ -378,6 +411,8 @@ export default function MazeGame() {
     setCollected([]);
     setHintCells([]);
     setHintsLeft(3);
+    setHopsLeft(3);
+    setHopArmed(false);
     setNotice("");
     if (noticeTimer.current) window.clearTimeout(noticeTimer.current);
     if (hintTimer.current) window.clearTimeout(hintTimer.current);
@@ -390,7 +425,7 @@ export default function MazeGame() {
   }, []);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => startGame("easy"), 0);
+    const timer = window.setTimeout(() => startGame("easy", "cat"), 0);
     return () => window.clearTimeout(timer);
   }, [startGame]);
 
@@ -420,51 +455,45 @@ export default function MazeGame() {
   const move = useCallback(
     (directionName: Direction) => {
       if (!maze || won) return;
-      const direction = DIRECTIONS.find(
-        (candidate) => candidate.name === directionName,
-      );
-      if (!direction) return;
-      const row = Math.floor(player / maze.size);
-      const column = player % maze.size;
-      const nextRow = row + direction.row;
-      const nextColumn = column + direction.column;
-      if (
-        nextRow < 0 || nextColumn < 0 || nextRow >= maze.size ||
-        nextColumn >= maze.size || maze.cells[player] & direction.wall
-      ) return;
-      const next =
-        player + direction.row * maze.size + direction.column;
-      const nextSteps = steps + 1;
+      const route = moveMazePlayer(maze.cells, maze.size, player, directionName, story === "rabbit" && hopArmed ? 2 : 1);
+      if (!route.length) return;
+      const next = route.at(-1)!;
+      const nextSteps = steps + route.length;
       setPlayer(next);
-      setTrail((current) =>
-        current.includes(next) ? current : [...current, next],
-      );
+      setTrail((current) => [...new Set([...current, ...route])]);
       setSteps(nextSteps);
-
-      if (yarnCells.includes(next) && !collected.includes(next)) {
-        const nextCollected = [...collected, next];
+      const found = route.filter((cell) => yarnCells.includes(cell) && !collected.includes(cell));
+      const nextCollected = [...collected, ...found];
+      if (found.length) {
         setCollected(nextCollected);
-        setNotice(`找到一团毛线！已收集 ${nextCollected.length}/3 团`);
+        setNotice(story === "rabbit"
+          ? `收集到${found.length > 1 ? `${found.length}滴` : "一滴"}水！菜园里已有${nextCollected.length}根胡萝卜长大。`
+          : `找到一团毛线！已收集 ${nextCollected.length}/3 团`);
         if (noticeTimer.current) window.clearTimeout(noticeTimer.current);
         noticeTimer.current = window.setTimeout(() => setNotice(""), 2200);
       }
+      if (story === "rabbit" && hopArmed) {
+        setHopArmed(false);
+        setHopsLeft((count) => Math.max(0, count - 1));
+      }
 
       if (next === maze.cells.length - 1) {
-        const yarnCount = collected.length + (yarnCells.includes(next) && !collected.includes(next) ? 1 : 0);
+        const pickupCount = nextCollected.length;
         setWon(true);
         setShowWinModal(true);
+        setHopArmed(false);
         recordScore({
           gameId: "maze",
           gameName: "纸上迷宫",
           difficulty: DIFFICULTIES[difficulty].label,
           elapsed,
           moves: nextSteps,
-          detail: `${nextSteps} 步 · ${formatDuration(elapsed)} · 毛线 ${yarnCount}/3 · ${mazeStars(yarnCount)} 星`,
+          detail: `${story === "rabbit" ? "小兔找胡萝卜" : "小猫寻鱼记"} · ${nextSteps} 步 · ${formatDuration(elapsed)} · ${story === "rabbit" ? "水滴" : "毛线"} ${pickupCount}/3 · ${mazeStars(pickupCount)} 星`,
           completed: true,
         });
       }
     },
-    [collected, difficulty, elapsed, maze, player, steps, won, yarnCells],
+    [collected, difficulty, elapsed, hopArmed, maze, player, steps, story, won, yarnCells],
   );
 
   useEffect(() => {
@@ -504,7 +533,7 @@ export default function MazeGame() {
     );
     setHintsLeft((count) => count - 1);
     if (noticeTimer.current) window.clearTimeout(noticeTimer.current);
-    setNotice(remaining.length ? "沿着亮起的格子，去找毛线吧！" : "沿着亮起的格子，去找小鱼吧！");
+    setNotice(remaining.length ? `沿着亮起的格子，去找${story === "rabbit" ? "水滴" : "毛线"}吧！` : `沿着亮起的格子，去找${story === "rabbit" ? "胡萝卜" : "小鱼"}吧！`);
     if (hintTimer.current) window.clearTimeout(hintTimer.current);
     hintTimer.current = window.setTimeout(() => {
       setHintCells([]);
@@ -551,7 +580,7 @@ export default function MazeGame() {
   };
 
   return (
-    <main className="maze-shell">
+    <main className={`maze-shell maze-story-${story}`}>
       <header className="game-nav">
         <Link href="/" className="back-link">
           ← 游戏厅
@@ -566,19 +595,21 @@ export default function MazeGame() {
 
       <section className="maze-layout">
         <div className="maze-copy">
-          <p className="eyebrow">MAZE GAME · 小猫的纸上冒险</p>
-          <h1>小猫寻鱼记</h1>
-          <p className="intro">
-            帮小猫从左边出发，找到右下角的小鱼！路上的 3 团毛线是额外挑战，不收集也能通关。
-          </p>
-          <CatMascot />
-          <p className="maze-star-rule">到达小鱼得 1 星 · 收集 2 团毛线得 2 星 · 集齐 3 团得 3 星</p>
+          <p className="eyebrow">MAZE GAME · 纸上冒险</p>
+          <h1>{STORIES[story].title}</h1>
+          <p className="intro">{STORIES[story].description}</p>
+          <div className={`maze-mascot ${story === "rabbit" ? "rabbit-mascot" : "cat-story-mascot"}`} aria-hidden="true">
+            {story === "rabbit" ? <Image src="/maze/rabbit.webp" alt="" width={427} height={640} unoptimized priority /> : <CatMascot />}
+            {story === "rabbit" && <span>{STORIES.rabbit.callout}</span>}
+          </div>
+          <p className="maze-star-rule">到达{STORIES[story].goal}得 1 星 · 收集 {story === "rabbit" ? "2 滴水" : "2 团毛线"}得 2 星 · {story === "rabbit" ? "收集 3 滴水" : "集齐 3 团毛线"}得 3 星{story === "rabbit" ? "；水滴是额外挑战，不收集也能通关，小菜园会随收集长大" : ""}</p>
+          <StoryPicker story={story} onSelect={(nextStory) => startGame(difficulty, nextStory)} />
           <div className="maze-levels" aria-label="选择难度">
             {(Object.keys(DIFFICULTIES) as Difficulty[]).map((level) => (
               <button
                 key={level}
                 className={difficulty === level ? "is-active" : ""}
-                onClick={() => startGame(level)}
+                onClick={() => startGame(level, story)}
               >
                 <strong>{DIFFICULTIES[level].label}</strong>
                 <small>{DIFFICULTIES[level].description}</small>
@@ -615,9 +646,10 @@ export default function MazeGame() {
 
         <div className="maze-game">
           <div className="maze-mobile-title">
-            <strong>小猫寻鱼记</strong>
-            <span>从左边出发，找到右下角的小鱼</span>
+            <strong>{STORIES[story].title}</strong>
+            <span>从左边出发，{STORIES[story].action}</span>
           </div>
+          <StoryPicker story={story} variant="mobile" onSelect={(nextStory) => startGame(difficulty, nextStory)} />
           <div className="maze-status" aria-label="本局状态">
             <div>
               <span>用时</span>
@@ -628,7 +660,7 @@ export default function MazeGame() {
               <strong>{steps}</strong>
             </div>
             <div>
-              <span>毛线</span>
+              <span>{STORIES[story].pickup}</span>
               <strong>{collected.length}/3</strong>
             </div>
             <button
@@ -636,15 +668,17 @@ export default function MazeGame() {
               disabled={won || !hintsLeft || !!hintCells.length}
               aria-label={`使用提示，还剩 ${hintsLeft} 次`}
             >
-              提示 {hintsLeft}
+              {story === "rabbit" ? "兔耳听听" : "提示"} {hintsLeft}
             </button>
-            <button onClick={() => startGame(difficulty)}>↻ 换一座</button>
+            <button onClick={() => startGame(difficulty, story)}>↻ 换一座</button>
+            {story === "rabbit" && <button type="button" className={`hop-control ${hopArmed ? "is-armed" : ""}`} aria-pressed={hopArmed} disabled={!hopsLeft || won} onClick={() => { setHopArmed((armed) => !armed); setNotice(hopArmed ? "收好蹦跳，慢慢走也能到！" : "蹦跳准备好：下一次方向操作最多前进两格，遇墙会停下。"); }}>蹦一蹦 {hopsLeft}</button>}
           </div>
           <p className="maze-live" aria-live="polite">
-            {notice || "用方向键、WASD、滑动或下方按钮移动小猫。"}
+            {notice || `用方向键、WASD、滑动或下方按钮移动${STORIES[story].buddy}。`}
           </p>
+          {story === "rabbit" && <div className="rabbit-garden" aria-label={`已收集${collected.length}滴水，菜园里有${collected.length}根胡萝卜长大`}><strong>小小菜园</strong><div>{[0, 1, 2].map((index) => <span key={index} className={index < collected.length ? "is-grown" : ""} aria-hidden="true">{index < collected.length ? <Image src="/maze/carrot.webp" alt="" width={28} height={28} unoptimized /> : "·"}</span>)}</div><small>{collected.length === 3 ? "萝卜丰收啦！" : `浇水进度 ${collected.length}/3`}</small></div>}
           <div className="maze-paper-frame">
-            <div className="maze-paper-title">MAZE GAME</div>
+            <div className="maze-paper-title">{STORIES[story].title}</div>
             <div
             className="maze-board"
             role="application"
@@ -689,26 +723,26 @@ export default function MazeGame() {
                 data-player={player === index || undefined}
                 data-pickup={
                   yarnCells.includes(index) && !collected.includes(index)
-                    ? "yarn"
+                    ? story === "rabbit" ? "dew" : "yarn"
                     : undefined
                 }
               >
                 {yarnCells.includes(index) && !collected.includes(index) && (
-                  <YarnIcon />
+                  story === "rabbit" ? <DewIcon /> : <YarnIcon />
                 )}
-                {index === maze.cells.length - 1 && <FishIcon />}
+                {index === maze.cells.length - 1 && <GoalIcon story={story} small />}
                 {trail.includes(index) && (
                   <i className="maze-trail-mark" aria-hidden="true" />
                 )}
               </div>
             ))}
               <i className="maze-token" style={playerStyle} aria-hidden="true">
-                <CatHead />
+                {story === "rabbit" ? <RabbitHead /> : <CatHead />}
               </i>
             </div>
-            <div className="maze-entry-caption">
-              <span>← 小猫出发</span>
-              <span>鱼骨终点 →</span>
+          <div className="maze-entry-caption">
+            <span>← {STORIES[story].buddy}出发</span>
+            <span>{STORIES[story].goal}终点 →</span>
             </div>
           </div>
           <div className="maze-pad" aria-label="移动方向">
@@ -739,14 +773,15 @@ export default function MazeGame() {
               ×
             </button>
             <p className="eyebrow">找到出口</p>
-            <h2>小猫找到小鱼啦！</h2>
+            <h2>{story === "rabbit" ? (collected.length === 3 ? "小兔的丰收野餐！" : "小兔找到胡萝卜啦！") : "小猫找到小鱼啦！"}</h2>
             <p className="earned-stars" aria-label={`获得${mazeStars(collected.length)}颗星`}>
               <span aria-hidden="true">{"★".repeat(mazeStars(collected.length))}{"☆".repeat(3 - mazeStars(collected.length))}</span>
             </p>
-            <p>收集毛线 {collected.length}/3 团 · 走了 {steps} 步 · 用时 {formatDuration(elapsed)}</p>
+            <p>收集{STORIES[story].pickup} {collected.length}/3 · 走了 {steps} 步 · 用时 {formatDuration(elapsed)}</p>
+            {story === "rabbit" && <div className="win-carrot"><Image src="/maze/carrot.webp" alt="长大的胡萝卜" width={120} height={120} unoptimized /><span>{collected.length === 3 ? "带上胡萝卜，和小兔去野餐吧！" : "菜园里还有萝卜苗等着你来浇水。"}</span></div>}
             <button
               className="primary-button"
-              onClick={() => startGame(difficulty)}
+              onClick={() => startGame(difficulty, story)}
             >
               再走一座
             </button>
@@ -764,7 +799,7 @@ export default function MazeGame() {
               <header className="print-sheet-heading">
                 <div>
                   <p>PAPER MAZE</p>
-                  <h1>小猫寻鱼记</h1>
+                  <h1>{STORIES[story].title}</h1>
                 </div>
                 <span>
                   {DIFFICULTIES[difficulty].label} · {mazeIndex + 1}/
@@ -772,12 +807,12 @@ export default function MazeGame() {
                 </span>
               </header>
               <p className="print-instructions">
-                帮小猫从左边出发找到小鱼！到达得1星，收集2团毛线得2星，集齐3团得3星。
+                {story === "rabbit" ? "陪小兔从左边出发找到胡萝卜！途中收集水滴浇灌小菜园；到达得1星，收集2滴得2星，集齐3滴得3星。" : "帮小猫从左边出发找到小鱼！到达得1星，收集2团毛线得2星，集齐3团得3星。"}
               </p>
               <div className="print-wayfinding">
-                <CatMascot />
+                {story === "rabbit" ? <Image src="/maze/rabbit.webp" alt="小兔" width={140} height={210} unoptimized /> : <CatMascot />}
                 <span aria-hidden="true">→</span>
-                <FishIcon />
+                <GoalIcon story={story} />
               </div>
               <div
                 className="print-maze-board"
@@ -798,11 +833,11 @@ export default function MazeGame() {
                     style={cellStyle(cellIndex === 0 ? walls & ~8 : cellIndex === printMaze.cells.length - 1 ? walls & ~2 : walls)}
                   >
                     {cellIndex === 0 ? (
-                      <CatHead />
+                      story === "rabbit" ? <RabbitHead /> : <CatHead />
                     ) : cellIndex === printMaze.cells.length - 1 ? (
-                      <FishIcon />
+                      <GoalIcon story={story} small />
                     ) : printYarns[mazeIndex]?.includes(cellIndex) ? (
-                      <YarnIcon />
+                      story === "rabbit" ? <DewIcon /> : <YarnIcon />
                     ) : (
                       ""
                     )}
